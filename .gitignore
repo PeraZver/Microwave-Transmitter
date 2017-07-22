@@ -1,2 +1,10 @@
 Datasheets
 Henrik's VNA
+
+HW/*.bak
+*.xml
+*-bak
+*.jpg
+*.cmp
+*.dcm
+*-rescue*

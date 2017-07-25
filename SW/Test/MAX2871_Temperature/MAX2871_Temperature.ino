@@ -19,8 +19,9 @@ Pero, June 2017
 */
 
 
-// include the SPI library:
+// libraries
 #include <SPI.h>
+#include "MAX2871.h"
 
 #define slaveSelectPin 5   //LE or slave select
 #define chipEnablePin  4   // (CE)
@@ -30,17 +31,22 @@ SPISettings MAX2871_SPISettings(1000000, MSBFIRST, SPI_MODE0);
 char incomingChar = 0;  //Serial input
 
 //Setting temperature read and MUX readout
-uint32_t regInitValues[6] = { 0x0,
-                              0x00000001,   //
-                              0x10004002,   // MUX[2:0] = 100, R = 1
-                              0x00000603,   // Clock DIV = 192 
-                              0x60000004,   // bits 31:29 reserved. Program to 011
-                              0x0004004D }; // MUX[3] = 1, ADCM = 001, ADCS = 1
-
+//uint32_t regInitValues[6] = { 0x0,
+//                              0x00000001,   //
+//                              0x10004002,   // MUX[2:0] = 100, R = 1
+//                              0x00000603,   // Clock DIV = 192 
+//                              0x60000004,   // bits 31:29 reserved. Program to 011
+//                              0x0004004D }; // MUX[3] = 1, ADCM = 001, ADCS = 1
+uint32_t regInitValues[6] = { EN_INT | N_DIV | REG_0,
+                              REG_1,   
+                              MUX_2 | DBR | RDIV2 | R_DIV | REG_2,   // MUX[2:0] = 100, R = 1
+                              CDIV | REG_3,   // Clock DIV = 192 
+                              REG4HEAD | REG_4,   // bits 31:29 reserved. Program to 011
+                              MUX_5 | ADCS | ADCM | REG_5 }; // MUX[3] = 1, ADCM = 001, ADCS = 1
 void setup() {
   delay(3000);
   Serial.begin(9600);
-  Serial.println("MAX2871 SPI Interface");  
+  Serial.println("MAX2871 Temperature readout");  
   Serial.println("v0.0");
   Serial.println("Pero, June 2017");
   Serial.println(" ");
@@ -77,7 +83,7 @@ void loop() {
       break;
       
     default:
-        MAX2871_Temp();
+       // MAX2871_Temp();
         MAX2871_Read();
         delay(1000);
   }
@@ -106,8 +112,8 @@ void MAX2871_Init (){
 void MAX2871_Read(){
 
    uint32_t spi_data = 0;
-   uint32_t ADC_Mask = 0x007F0000;
    uint8_t spi_packet[4] = {0}; 
+   
    uint8_t ADC_temperature = 0;
    float temperature = 0;
    signed char i;
@@ -117,7 +123,7 @@ void MAX2871_Read(){
 
    SPI.beginTransaction(MAX2871_SPISettings);  // start new clock sequence. No need to change SS to low.
    for ( i = 0; i < 4; i++)   {
-       spi_packet[i] = SPI.transfer(0x06);   // read from SPI shift register 4 times
+       spi_packet[i] = SPI.transfer(0x00);   // read from SPI shift register 4 times
    }
    SPI.endTransaction();    
   
@@ -128,19 +134,32 @@ void MAX2871_Read(){
      if ( i != 3)
          spi_data = spi_data << 8;
   }
-  Serial.println(spi_data << 2, HEX);
+  spi_data = spi_data << 2; //one clk period delay
+  Serial.println(spi_data, HEX);
   Serial.println("Reading done!");   
 
-  ADC_temperature = ( spi_data & ADC_Mask ) >> 16;
+  ADC_temperature = ( spi_data & ADC_mask ) >> 16;
   temperature = 95 - 1.14*ADC_temperature;
-
-  Serial.print("\nTemp data: ");
+  
+  if (spi_data & ADCV)
+    Serial.println("ADC data valid!"); 
+  else
+    Serial.println("ADC data invalid!"); 
+    
+  Serial.print("Temp data: ");
   Serial.print(ADC_temperature);
   Serial.print("\nTemperature: ");
   Serial.print(temperature);
   Serial.println("");
+
+  if (spi_data & VASA)
+    Serial.println("VCO Autoselect searching"); 
+  else
+    Serial.println("VAS Completed"); 
   
-  
+  Serial.print("Current VCO: ");
+  Serial.print((spi_data & V) >> 3);
+  Serial.println("");
   
 }
 

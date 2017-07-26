@@ -93,7 +93,7 @@
 #define LD LD_VAL << 22 // sets lock detection pin function
 #define MUX_5 MUX_MSB << 18 // sets MSB of MUX bits
 #define ADCS 1 << 6 // Starts ADC mode
-#define ADCM ADC_MODE << 3 // ADC Mode
+//#define ADCM ADC_MODE << 3 // ADC Mode  THIS PART IS DEFINED IN USER INTERFACE
 #define REG_5 0b101
 
 // register 6 masks (read only values)

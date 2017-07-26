@@ -33,10 +33,10 @@ char incomingChar = 0;  //Serial input
 //Setting temperature read and MUX readout
 uint32_t regInitValues[6] = { EN_INT | N_DIV | REG_0,
                               REG_1,   
-                              MUX_2 | R_DIV | REG_2,   // MUX[2:0] = 100, R = 1
+                              R_DIV | REG_2,   // MUX[2:0] = 100, R = 1
                               REG_3,   // Clock DIV = 192 
                               REG4HEAD | REG_4,   // bits 31:29 reserved. Program to 011
-                              MUX_5 | REG_5 }; // MUX[3] = 1, ADCM = 001, ADCS = 1
+                              REG_5 }; // MUX[3] = 1, ADCM = 001, ADCS = 1
 
 uint32_t MAX2871_Registers[6] = {0};
 
@@ -102,7 +102,8 @@ void MAX2871_Init (){
   }
   delay(20);
   }
-    
+ 
+  MAX2871_SPI_Init();   
 }
 
 void MAX2871_Read(){
@@ -116,7 +117,7 @@ void MAX2871_Read(){
    uint8_t ADC_data = 0;
    float data = 0;
    signed char i;
-
+ 
    MAX2871_ADC_Init();   
    
    Serial.println("");   
@@ -225,5 +226,16 @@ void MAX2871_ADC_Reset(void){
  MAX2871_Registers[5] &= ~(ADCS);
  MAX2871_SPI_tx(MAX2871_Registers[5]);
  
+}
+
+void MAX2871_SPI_Init(){
+  /* Set MUX bits to enable reg6 readout over SPI.
+   *  
+   */
+   MAX2871_Registers[5] |= MUX_5;
+   MAX2871_SPI_tx(MAX2871_Registers[5]);
+   MAX2871_Registers[2] |= MUX_2;
+   MAX2871_SPI_tx(MAX2871_Registers[2]);
+   
 }
 

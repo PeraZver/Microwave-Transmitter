@@ -1,11 +1,17 @@
 #ifndef MAX2871_H
 #define MAX2871_H
 
+#include <SPI.h>
+
+#define slaveSelectPin 5   //LE or slave select
+#define chipEnablePin  4   // (CE)
+#define clkPin         13  // clk pin
+
 // this parameters should be changed to suit the application
-#define N 100  // (16 bit feedback divider factor in integer mode
-#define F 0  // 12 bit  fractional divider
-#define M 0  // 12 bit modulus value in fractional mode
-#define R 1  // 10 bit ref. frequency divider value
+#define N_val 100  // (16 bit feedback divider factor in integer mode
+#define F_val 0  // 12 bit  fractional divider
+#define M_val 0  // 12 bit modulus value in fractional mode
+#define R_val 1  // 10 bit ref. frequency divider value
 #define CDIV_VAL 192 // 12 bit clock divide value (since fPFD = 19.2 MHz, 19.2MHz/100kHz = 192
 #define B_POWER 0b00 // Sets RFOUTB single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm
 #define A_POWER 0b00 // Sets RFOUTA single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm
@@ -16,8 +22,8 @@
 #define CPL_MODE 0b00  //CPL linearity mode: 0b00in integer mode, 0b01 10% in frac mode, 0b10 for 20%, and 0b11 for 30%
 #define CPT_MODE 0b00  // 00 normal mode, 01 long reset, 10 force into source, 11 force into sink
 #define CP_CURRENT 0x0 // 4 bit CP current in mA
-#define P 0x0     // 12-bit phase value for adjustment
-#define SD  0b00 //sigma delta noise mode: 0b00 low noise mode, 0b01 res, 0b10 low spur 1 mode, 0b11 low spur 2 mode
+#define P_val 0x0     // 12-bit phase value for adjustment
+#define SD_val  0b00 //sigma delta noise mode: 0b00 low noise mode, 0b01 res, 0b10 low spur 1 mode, 0b11 low spur 2 mode
 #define VCO 0x0 // 6 bit VCO selection
 #define CDIV_MODE 0b00 // clock divide mode: 0b00 mute until lock delay, 01 fast lock enable, 10 phase adjustment, 11 reserved
 #define DIVA_VAL 0b000 //Sets RFOUT_ output divider mode
@@ -30,24 +36,24 @@
 
 // register 0 masks
 #define EN_INT 1 << 31    // enables integer mode
-#define N_DIV N << 15     // puts value N on its place
-#define F_DIV F << 3
+#define N_DIV N_val << 15     // puts value N on its place
+#define F_DIV F_val << 3
 #define REG_0 0b000
 
 // register 1 masks 
 #define CPL CPL_MODE << 29  // Sets CP linearity mode
 #define CPT CPT_MODE << 27 // Sets CP test mode
-#define PHASE P << 15 // Sets phase adjustment
-#define MODULUS M << 3  // sets modulus value
+#define PHASE P_val << 15 // Sets phase adjustment
+#define MODULUS M_val << 3  // sets modulus value
 #define REG_1 0b001
 
 // register 2 masks
 #define LDS 1 << 31 //Lock detect speed adjustment: 0 fPFD < 32 MHz, 1 pPFD > 32 MHz
-#define SDN SD << 29 //sets sigma-delta noise
+#define SDN SD_val << 29 //sets sigma-delta noise
 #define MUX_2 MUX_LSB << 26  //sets MUX bits
 #define DBR 1 << 25 //sets reference doubler mode, 0 disable, 1 enable
 #define RDIV2 1 << 24 //enable reference divide-by-2
-#define R_DIV R << 14 // set reference divider value
+#define R_DIV R_val << 14 // set reference divider value
 #define REG4DB 1 << 13 // sets double buffer mode
 #define CP_SET  CP_CURRENT << 9  // sets CP current 
 #define LDF 1 << 8 // sets lock detecet in integer mode
@@ -103,6 +109,16 @@
 #define V 0x3F << 3  // Current VCO
 #define REG_6 0b110
 
+extern uint32_t regInitValues[6]; 
+extern uint32_t MAX2871_Registers[6];
+// ADC selection varible
+extern byte adc_mode;  // 001 for temperature, 100 for V tune.
+extern SPISettings MAX2871_SPISettings;
 
-
+void MAX2871_Init();
+void MAX2871_SPI_Init();
+void MAX2871_ADC_Init();
+void MAX2871_Read();
+void MAX2871_SPI_tx(uint32_t spi_data); 
+void MAX2871_ADC_Reset();
 #endif

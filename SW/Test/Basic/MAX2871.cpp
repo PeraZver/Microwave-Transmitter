@@ -115,15 +115,15 @@ void MAX2871_SPI_tx(uint32_t spi_data){
        //Serial.println(spi_package[i], HEX);
     }
     
-    Serial.println("Sending data: "); 
+    Serial.println("Sending data to MAX2871: "); 
     Serial.println(spi_data, HEX);
-    digitalWrite(slaveSelectPin,LOW);   
+    digitalWrite(MAX2871_SS,LOW);   
     SPI.beginTransaction(MAX2871_SPISettings);
      
     for ( i = 3; i >= 0; i--)
          SPI.transfer(spi_package[i]); 
           
-    digitalWrite(slaveSelectPin,HIGH);
+    digitalWrite(MAX2871_SS,HIGH);
     SPI.endTransaction();  
     Serial.println("SPI transmission done!");
     delay(20);

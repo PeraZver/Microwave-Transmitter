@@ -9,3 +9,6 @@ HW/*.bak
 *.dcm
 *-rescue*
 Theory
+
+
+SW/Registers/*.exe*

@@ -1,0 +1,7 @@
+Exception: STATUS_ACCESS_VIOLATION at eip=6117D832
+eax=004011E8 ebx=00000000 ecx=00000001 edx=00000000 esi=0061B88C edi=00000001
+ebp=611C0CD0 esp=0061B6C0 program=D:\Elektronika\Microwave Transmitter\SW\Registers\a.exe, pid 9204, thread main
+cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
+Stack trace:
+Frame     Function  Args
+End of stack trace

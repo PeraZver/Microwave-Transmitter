@@ -5,10 +5,10 @@ uint32_t regInitValues[6] = { 0x803C0000,
                               0x80000141,
                               0x00005E42,
                               0xE8000013,
-                              0x618160FC,
+                              0x618160FC | DIVA,
                               0x00400005}; // MUX[3] = 1, ADCM = 001, ADCS = 1
 
-uint32_t MAX2871_Registers[6] = {0};
+uint32_t MAX2871_Registers[6] = {0}; //Working registers, that will be changed in code
 // ADC selection varible
 byte adc_mode = 0b001;  // 001 for temperature, 100 for V tune.
 
@@ -22,16 +22,28 @@ void MAX2871_Init (){
 //Register programming order should be address 0x05,
 //0x04, 0x03, 0x02, 0x01, and 0x00. 
 
-// Writing 2 times
- for (int j = 0; j < 2; j++){
-  for (int i = 5; i >= 0; i--){   // 6 write registers
-      MAX2871_SPI_tx (regInitValues[i]);  
-      MAX2871_Registers[i] = regInitValues[i];    // write init values into working registers
-  }
-  delay(20);
-  }
- 
-  MAX2871_SPI_Init();   
+  // Enable MAX3871 chip
+  pinMode(MAX2871_CE, OUTPUT);
+  digitalWrite(MAX2871_CE, HIGH);
+    
+  // set the slave select pin as an output:
+  pinMode (MAX2871_SS, OUTPUT);
+  digitalWrite (MAX2871_SS, HIGH);  
+
+  //Disable RF output
+  pinMode(MAX2871_RF_EN, OUTPUT);
+  digitalWrite (MAX2871_RF_EN, LOW);  
+
+  // Writing 2 times
+   for (int j = 0; j < 2; j++){
+    for (int i = 5; i >= 0; i--){   // 6 write registers
+        MAX2871_SPI_tx (regInitValues[i]);  
+        MAX2871_Registers[i] = regInitValues[i];    // write init values into working registers
+    }
+    delay(20);
+    }
+   
+   MAX2871_SPI_Init();   
 }
 
 void MAX2871_Read(){
@@ -150,7 +162,7 @@ void MAX2871_ADC_Reset(void){
 /*
  * Apparently ADC won't work if ADCS is constantly on. For that reason, I'll need to reset it after every read.
  */
- MAX2871_Registers[5] &= ~(111 << 3);
+ MAX2871_Registers[5] &= ~(0b111 << 3);
  MAX2871_Registers[5] &= ~(ADCS);
  MAX2871_SPI_tx(MAX2871_Registers[5]);
  
@@ -165,4 +177,36 @@ void MAX2871_SPI_Init(){
    MAX2871_Registers[2] |= MUX_2;
    MAX2871_SPI_tx(MAX2871_Registers[2]);
    
+}
+
+void MAX2871_RFA_Enable(){
+  /* Activates RF A output. */
+  MAX2871_Registers[4] |= RFA_EN;
+  MAX2871_SPI_tx(MAX2871_Registers[4]);
+  digitalWrite(MAX2871_RF_EN, HIGH);
+ 
+}
+
+void MAX2871_RFB_Enable(){
+  /* Activates RF B output. */
+  MAX2871_Registers[4] |= RFB_EN;
+  MAX2871_SPI_tx(MAX2871_Registers[4]);
+  digitalWrite(MAX2871_RF_EN, HIGH);
+ 
+}
+
+void MAX2871_RFA_Disable(){
+  /* Activates RF A output. */
+  MAX2871_Registers[4] &= ~RFA_EN;
+  MAX2871_SPI_tx(MAX2871_Registers[4]);
+  digitalWrite(MAX2871_RF_EN, LOW);
+ 
+}
+
+void MAX2871_RFB_Disable(){
+  /* Activates RF B output. */
+  MAX2871_Registers[4] &= ~RFB_EN;
+  MAX2871_SPI_tx(MAX2871_Registers[4]);
+  digitalWrite(MAX2871_RF_EN, LOW);
+ 
 }

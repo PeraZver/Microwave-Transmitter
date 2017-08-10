@@ -5,13 +5,13 @@
  *  It is based on individual examples of each component (see the folder).
  *  
  *  
- *  
  *  CLK is pin 13
-  * DATA OUT is pin 11
-  * LE is pin 5
   * DATA IN is pin 12
-  * CE is pin 6
+  * DATA OUT is pin 11
+  * LE for MAX2871 is pin 5
+  * CE for MAX2871 is pin 6
   * RF EN is pin 7
+  * LE for PE43711 is pin 10
   * 
 Pero, August 2017
  
@@ -19,28 +19,7 @@ Pero, August 2017
 #include <SPI.h>
 #include <ADC.h>
 #include "MAX2871.h"
-
-// Attenuator settings
-#define PE43711_SS 10  //LE or slave select
-SPISettings PE43711_SPISettings(1000000, LSBFIRST, SPI_MODE0);
-char att_val = 0;   //
-
-// switch settings
-// Pins that control the filter
-#define v1 2
-#define v2 1
-#define v3 3
-#define v4 0
-
-byte pin[4] = {v1, v2, v3, v4};  // array for pin selection
-
-// ADC settings
-const int readPin = A0; // ADC0
-const int readPin2 = A1; // ADC1
-
-ADC *adc = new ADC(); // adc object;
-int value;
-int value2;
+#include "MWtx.h"
 
 // user input
 char incomingChar = 0;  //Serial input
@@ -55,27 +34,7 @@ void setup() {
   Serial.println(" ");
   Serial.println(" ");
   
-  // Enable MAX3871 chip
-  pinMode(MAX2871_CE, OUTPUT);
-  digitalWrite(MAX2871_CE, HIGH);
-    
-  // set the slave select pin as an output:
-  pinMode (MAX2871_SS, OUTPUT);
-  digitalWrite (MAX2871_SS, HIGH);  
-  
-  // set the slave select pin as an output:
-  pinMode (PE43711_SS, OUTPUT);
-  digitalWrite (PE43711_SS, HIGH);
- 
-  // set switch selection pins      
-  pinMode (v1, OUTPUT);
-  pinMode (v2, OUTPUT);
-  pinMode (v3, OUTPUT);
-  pinMode (v4, OUTPUT);
-
-  // ADC pins as inputs
-  pinMode(readPin, INPUT); 
-  pinMode(readPin2, INPUT); 
+  MWPins(); // Set pins for all of the components
 
   // initialize SPI:
   SPI.begin(); 
@@ -84,157 +43,44 @@ void setup() {
   MAX2871_Init ();
   Serial.println("MAX2871 Initialized");
 
-  // Attenuator set  to zero value and filter 1 selected. 
-  // Improved examples should be able to let user control these settings.
-  
-  PE43711_SPI_tx(att_val);     
-  Serial.print("Attentuation set: ");
-  Serial.print((float)att_val/4);
-  Serial.print(" dB\n");
-  SetSwitch(0b0100); 
-  Serial.println("Selected filter 3");
-
-  ///// ADC0 ////
-    // reference can be ADC_REF_3V3, ADC_REF_1V2 (not for Teensy LC) or ADC_REF_EXT.
-    //adc->setReference(ADC_REF_1V2, ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
-
-    adc->setAveraging(32); // set number of averages
-    adc->setResolution(12); // set bits of resolution
-
-    // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED_16BITS, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-    // see the documentation for more information
-    adc->setConversionSpeed(ADC_HIGH_SPEED); // change the conversion speed
-    // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-    adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
-
-    //adc->enableInterrupts(ADC_0);
-
-    // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_0), 0, ADC_0); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_0)/3.3, 0, 1, ADC_0); // ready if value lies out of [1.0,2.0] V
-
-    ////// ADC1 /////
-    #if ADC_NUM_ADCS>1
-    adc->setAveraging(32, ADC_1); // set number of averages
-    adc->setResolution(16, ADC_1); // set bits of resolution
-    adc->setConversionSpeed(ADC_VERY_LOW_SPEED, ADC_1); // change the conversion speed
-    adc->setSamplingSpeed(ADC_VERY_LOW_SPEED, ADC_1); // change the sampling speed
-
-    // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_1), 0, ADC_1); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_1)/3.3, 0, 1, ADC_1); // ready if value lies out of [1.0,2.0] V
-    #endif
-
-    Serial.println("ADC initialized");
-    Serial.println("End setup"); 
+  MWInit();
+  Serial.println("Attentuation and filter selected.");
+  Serial.println("End setup"); 
 }
 
 void loop() {
-  if(Serial.available() > 0) 
+  if(Serial.available() > 0){
     incomingChar = Serial.read();
-    
-  switch (incomingChar){  
-    case 'v':    
-        adc_mode = 0b100;
+      
+    switch (incomingChar){  
+      case 'v':    
+          adc_mode = 0b100;
+          break;
+      
+      case 't':  
+          adc_mode = 0b001;
+          break;
+          
+      case 'e':
+        MAX2871_RFA_Enable();      
+        Serial.println("RFA out activated.");
         break;
-    
-    case 't':  
-        adc_mode = 0b001;
-        break;
-        
-    default:   
-        ;
+  
+     case 'd':
+        MAX2871_RFA_Disable();
+        Serial.println("RFA out deactivated.");
+        break;  
+          
+      default:   
+          ;
+    }
   }
   MAX2871_Read();
-  
-  //RSSI readout
-  value = adc->analogRead(readPin); // read a new value, will return ADC_ERROR_VALUE if the comparison is false.
-  
-  Serial.print("\nRSSI A: ");
-  Serial.println(value*3.3/adc->getMaxValue(ADC_0), DEC);
-  
-  #if ADC_NUM_ADCS>1
-  value2 = adc->analogRead(readPin2, ADC_1);
-  
-  Serial.print("Pin: ");
-  Serial.print(readPin2);
-  Serial.print(", value ADC1: ");
-  Serial.println(value2*3.3/adc->getMaxValue(ADC_1), DEC);
-  #endif
-
-  
-    /* fail_flag contains all possible errors,
-        They are defined in  ADC_Module.h as
-
-        ADC_ERROR_OTHER
-        ADC_ERROR_CALIB
-        ADC_ERROR_WRONG_PIN
-        ADC_ERROR_ANALOG_READ
-        ADC_ERROR_COMPARISON
-        ADC_ERROR_ANALOG_DIFF_READ
-        ADC_ERROR_CONT
-        ADC_ERROR_CONT_DIFF
-        ADC_ERROR_WRONG_ADC
-        ADC_ERROR_SYNCH
-
-        You can compare the value of the flag with those masks to know what's the error.
-    */
-
-    if(adc->adc0->fail_flag) {
-        Serial.print("ADC0 error flags: 0x");
-        Serial.println(adc->adc0->fail_flag, HEX);
-        if(adc->adc0->fail_flag == ADC_ERROR_COMPARISON) {
-            adc->adc0->fail_flag &= ~ADC_ERROR_COMPARISON; // clear that error
-            Serial.println("Comparison error in ADC0");
-        }
-    }
-    #if ADC_NUM_ADCS>1
-    if(adc->adc1->fail_flag) {
-        Serial.print("ADC1 error flags: 0x");
-        Serial.println(adc->adc1->fail_flag, HEX);
-        if(adc->adc1->fail_flag == ADC_ERROR_COMPARISON) {
-            adc->adc1->fail_flag &= ~ADC_ERROR_COMPARISON; // clear that error
-            Serial.println("Comparison error in ADC1");
-        }
-    }
-    #endif
-
+  RSSI_Read();  
 
   delay(1000);
 }
-
-void PE43711_SPI_tx(char att){
-  /*
-   * This function takes 8-bit data and sends it to PE43711 via SPI. 
-   * The shift register must be loaded while LE is held
-     LOW to prevent the attenuator value from changing
-     as data is entered. The LE input should then be
-     toggled HIGH and brought LOW again, latching the
-     new data into the DSA. 
-   */
-    
-    Serial.println("Sending data to PE43711: "); 
-    Serial.println(att, HEX);
-    digitalWrite(PE43711_SS,LOW);   
-    SPI.beginTransaction(PE43711_SPISettings);
-    SPI.transfer(att);           
-    digitalWrite(PE43711_SS,HIGH);
-    delay(0.001);
-    digitalWrite(PE43711_SS,LOW);
-//    delay(1);
-//    digitalWrite(PE43711_SS,HIGH);  // Disable further writing    
-    SPI.endTransaction();  
-    Serial.println("SPI transmission done!");
-    delay(20);
-}
   
-
-void SetSwitch(byte selection){
-/* based on 4 values sets the switch of the filter */
-  for (int i = 0; i < 4; i++)
-      digitalWrite(pin[i], (selection & (1 << i)));
-}
-
 
 // If you enable interrupts make sure to call readSingle() to clear the interrupt.
 void adc0_isr() {

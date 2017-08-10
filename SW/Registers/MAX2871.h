@@ -1,19 +1,14 @@
+/* THIS VERSION OF MAX2871.h CONTAINS REGISTER MASKS ONLY.
+	IT CANNOT BE USED WITH MAX2871 EXAMPLES. */
+
 #ifndef MAX2871_H
 #define MAX2871_H
-
-#include <SPI.h>
-
-#define MAX2871_SS 5   //LE or slave select
-#define MAX2871_CE 4   // (CE)
-#define MAX2871_RF_EN 7 //RF enable
-#define clkPin      13  // clk pin
 
 // this parameters should be changed to suit the application
 #define N_val 100  // (16 bit feedback divider factor in integer mode
 #define F_val 0  // 12 bit  fractional divider
 #define M_val 0  // 12 bit modulus value in fractional mode
 #define R_val 1  // 10 bit ref. frequency divider value
-#define DIVA_VAL 0b101 //Sets RFOUT_ output divider mode
 #define CDIV_VAL 192 // 12 bit clock divide value (since fPFD = 19.2 MHz, 19.2MHz/100kHz = 192
 #define B_POWER 0b00 // Sets RFOUTB single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm
 #define A_POWER 0b00 // Sets RFOUTA single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm
@@ -28,6 +23,7 @@
 #define SD_val  0b00 //sigma delta noise mode: 0b00 low noise mode, 0b01 res, 0b10 low spur 1 mode, 0b11 low spur 2 mode
 #define VCO 0x0 // 6 bit VCO selection
 #define CDIV_MODE 0b00 // clock divide mode: 0b00 mute until lock delay, 01 fast lock enable, 10 phase adjustment, 11 reserved
+#define DIVA_VAL 0b000 //Sets RFOUT_ output divider mode
 #define BS 384
 #define BS_MSB_VAL (BS >> 8) // 2 MSBs of Band select clock divider  
 #define BS_LSB_VAL (BS & ~(11 << 8))  // 8 LSBs of band select clock divider
@@ -110,20 +106,4 @@
 #define V 0x3F << 3  // Current VCO
 #define REG_6 0b110
 
-extern uint32_t regInitValues[6]; 
-extern uint32_t MAX2871_Registers[6];
-// ADC selection varible
-extern byte adc_mode;  // 001 for temperature, 100 for V tune.
-extern SPISettings MAX2871_SPISettings;
-
-void MAX2871_Init();
-void MAX2871_SPI_Init();
-void MAX2871_ADC_Init();
-void MAX2871_Read();
-void MAX2871_SPI_tx(uint32_t spi_data); 
-void MAX2871_ADC_Reset();
-void MAX2871_RFA_Enable();
-void MAX2871_RFB_Enable();
-void MAX2871_RFA_Disable();
-void MAX2871_RFB_Disable();
 #endif

@@ -35,14 +35,14 @@ void MAX2871_Init (){
   digitalWrite (MAX2871_RF_EN, LOW);  
 
   // Writing 2 times
-   for (int j = 0; j < 2; j++){
+  for (int j = 0; j < 2; j++){
     for (int i = 5; i >= 0; i--){   // 6 write registers
         MAX2871_SPI_tx (regInitValues[i]);  
         MAX2871_Registers[i] = regInitValues[i];    // write init values into working registers
     }
     delay(20);
-    }
-   
+  }
+  
    MAX2871_SPI_Init();   
 }
 
@@ -57,7 +57,8 @@ void MAX2871_Read(){
    uint8_t ADC_data = 0;
    float data = 0;
    signed char i;
- 
+
+   Serial.println("\nSetting MAX2871 ADC ...");
    MAX2871_ADC_Init();   
    
    Serial.println("");   
@@ -69,6 +70,7 @@ void MAX2871_Read(){
        spi_packet[i] = SPI.transfer(0x00);   // read from SPI shift register 4 times
    }
    SPI.endTransaction();  
+   
    Serial.println("Data read:");
    for ( i = 0; i < 4; i++){
      //Serial.println(spi_packet[i], HEX);
@@ -83,11 +85,11 @@ void MAX2871_Read(){
    
    if (spi_data & ADCV)
      Serial.println("ADC data valid!"); 
-  else
-    Serial.println("ADC data invalid!");    
-  ADC_data = ( spi_data & ADC_mask ) >> 16;      
-  Serial.print("ADC data: ");
-  Serial.print(ADC_data);
+   else
+     Serial.println("ADC data invalid!");    
+   ADC_data = ( spi_data & ADC_mask ) >> 16;      
+   Serial.print("ADC data: ");
+   Serial.print(ADC_data);
   
   if (adc_mode == 1){
       data = 95 - 1.14*ADC_data;
@@ -210,3 +212,10 @@ void MAX2871_RFB_Disable(){
   digitalWrite(MAX2871_RF_EN, LOW);
  
 }
+
+void MAX2871_Print_Registers(void){
+  /* Printout current register settings */
+  for (int i = 0; i<6; i++)
+    Serial.println(MAX2871_Registers[i], HEX);
+}
+

@@ -39,9 +39,6 @@ void PE43711_SPI_tx(char att){
     delay(20);
 }
 
-
-
-
 void SetSwitch(byte selection){
 /* based on 4 values sets the switch of the filter */
   for (int i = 0; i < 4; i++)
@@ -66,8 +63,10 @@ void MWPins(void){
 }
 
 void MWInit(void){
-	  // Attenuator set  to zero value and filter 1 selected. 
-  // Improved examples should be able to let user control these settings.
+  /* This function initializes settings for attenuator, filter and ADC.
+   * Attenuator set  to zero value (0 dB) and filter 3 is selected (6 GHz cutoff).
+   * Teensy 3.2 has two ADCs while LC only one. 
+   */
   
   PE43711_SPI_tx(att_val);     
   Serial.print("Attentuation set: ");

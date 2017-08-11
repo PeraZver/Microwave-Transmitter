@@ -29,12 +29,12 @@ void setup() {
   delay(3000);
   Serial.println("Microwave transmitter");
   Serial.println("Basic configuration example");  
-  Serial.println("v1.0");
+  Serial.println("v1.1");
   Serial.println("Pero, July 2017");
   Serial.println(" ");
   Serial.println(" ");
   
-  MWPins(); // Set pins for all of the components
+  MWPins(); // Set pins for all components
 
   // initialize SPI:
   SPI.begin(); 
@@ -62,21 +62,29 @@ void loop() {
           break;
           
       case 'e':
-        MAX2871_RFA_Enable();      
-        Serial.println("RFA out activated.");
-        break;
+         MAX2871_RFA_Enable();      
+         Serial.println("\nRFA out activated.\n");
+         break;
   
-     case 'd':
-        MAX2871_RFA_Disable();
-        Serial.println("RFA out deactivated.");
-        break;  
+      case 'd':
+         MAX2871_RFA_Disable();
+         Serial.println("\nRFA out deactivated.\n");
+         break;  
+
+      case 'r':
+         MAX2871_Read();
+         RSSI_Read();  
+         break;   
+
+      case 'g':
+         Serial.println("\nMAX2871 Registers printout: \n");
+         MAX2871_Print_Registers();
+         break;
           
       default:   
           ;
     }
   }
-  MAX2871_Read();
-  RSSI_Read();  
 
   delay(1000);
 }

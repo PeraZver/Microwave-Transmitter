@@ -80,6 +80,26 @@ void loop() {
          Serial.println("\nMAX2871 Registers printout: \n");
          MAX2871_Print_Registers();
          break;
+
+      case '1':
+        Serial.println("\nSelected filter 1.\n");
+        SetSwitch(1);
+        break;
+
+      case '2':
+        Serial.println("\nSelected filter 2.\n");
+        SetSwitch(2);
+        break;
+
+      case '3':
+        Serial.println("\nSelected filter 3.\n");
+        SetSwitch(3);
+        break;
+
+      case '4':
+        Serial.println("\nSelected filter 4.\n");
+        SetSwitch(4);
+        break;
           
       default:   
           ;

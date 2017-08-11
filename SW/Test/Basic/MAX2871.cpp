@@ -5,7 +5,7 @@ uint32_t regInitValues[6] = { 0x803C0000,
                               0x80000141,
                               0x00005E42,
                               0xE8000013,
-                              0x618160FC | DIVA,
+                              0x618160DC | DIVA,
                               0x00400005}; // MUX[3] = 1, ADCM = 001, ADCS = 1
 
 uint32_t MAX2871_Registers[6] = {0}; //Working registers, that will be changed in code

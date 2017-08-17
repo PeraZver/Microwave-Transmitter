@@ -13,7 +13,7 @@
 #define F_val 0  // 12 bit  fractional divider
 #define M_val 0  // 12 bit modulus value in fractional mode
 #define R_val 1  // 10 bit ref. frequency divider value
-#define DIVA_VAL 0b101 //Sets RFOUT_ output divider mode
+#define DIVA_VAL 0b010 //Sets RFOUT_ output divider mode
 #define CDIV_VAL 192 // 12 bit clock divide value (since fPFD = 19.2 MHz, 19.2MHz/100kHz = 192
 #define B_POWER 0b00 // Sets RFOUTB single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm
 #define A_POWER 0b00 // Sets RFOUTA single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm

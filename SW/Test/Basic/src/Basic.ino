@@ -28,7 +28,7 @@ char incomingChar = 0;  //Serial input
 
 void setup() {
   Serial.begin(9600);
-  delay(3000);
+  while (!Serial.available()) ;
   Serial.println("Microwave transmitter");
   Serial.println("Basic configuration example");
   Serial.println("v1.1");
@@ -81,6 +81,26 @@ void loop() {
       case 'g':
          Serial.println("\nMAX2871 Registers printout:");
          MAX2871_Print_Registers();
+         break;
+
+     case 'q':
+         Serial.println("\nSetting power to -4 dBm");
+         MAX2871_RFA_Power(0);
+         break;
+
+     case 'w':
+         Serial.println("\nSetting power to -1 dBm");
+         MAX2871_RFA_Power(1);
+         break;
+
+     case 'a':
+         Serial.println("\nSetting power to 2 dBm");
+         MAX2871_RFA_Power(2);
+         break;
+
+     case 's':
+         Serial.println("\nSetting power to 5 dBm");
+         MAX2871_RFA_Power(3);
          break;
 
       case '1':

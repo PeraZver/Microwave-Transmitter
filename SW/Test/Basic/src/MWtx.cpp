@@ -4,7 +4,7 @@
 char att_val = 0;   //
 SPISettings PE43711_SPISettings(1000000, LSBFIRST, SPI_MODE0);
 
-// Switch 
+// Switch
 byte pin[4] = {v1, v2, v3, v4};  // array for pin selection
 
 
@@ -16,25 +16,25 @@ int value2 = 0;  // adc1 value
 
 void PE43711_SPI_tx(char att){
   /*
-   * This function takes 8-bit data and sends it to PE43711 via SPI. 
+   * This function takes 8-bit data and sends it to PE43711 via SPI.
    * The shift register must be loaded while LE is held
      LOW to prevent the attenuator value from changing
      as data is entered. The LE input should then be
      toggled HIGH and brought LOW again, latching the
-     new data into the DSA. 
+     new data into the DSA.
    */
-    
-    Serial.println("Sending data to PE43711: "); 
+
+    Serial.println("Sending data to PE43711: ");
     Serial.println(att, HEX);
-    digitalWrite(PE43711_SS,LOW);   
+    digitalWrite(PE43711_SS,LOW);
     SPI.beginTransaction(PE43711_SPISettings);
-    SPI.transfer(att);           
+    SPI.transfer(att);
     digitalWrite(PE43711_SS,HIGH);
     delay(0.001);
     digitalWrite(PE43711_SS,LOW);
 //    delay(1);
-//    digitalWrite(PE43711_SS,HIGH);  // Disable further writing    
-    SPI.endTransaction();  
+//    digitalWrite(PE43711_SS,HIGH);  // Disable further writing
+    SPI.endTransaction();
     Serial.println("SPI transmission done!");
     delay(20);
 }
@@ -50,29 +50,33 @@ void MWPins(void){
   // set the slave select pin as an output:
   pinMode (PE43711_SS, OUTPUT);
   digitalWrite (PE43711_SS, HIGH);
- 
-  // set switch selection pins      
+
+  // set switch selection pins
   pinMode (v1, OUTPUT);
   pinMode (v2, OUTPUT);
   pinMode (v3, OUTPUT);
   pinMode (v4, OUTPUT);
 
+  //Set power amplifier PWDN low
+  pinMode(PWDN, OUTPUT);
+  digitalWrite(PWDN, LOW);
+
   // ADC pins as inputs
-  pinMode(readPin, INPUT); 
-  pinMode(readPin2, INPUT); 
+  pinMode(readPin, INPUT);
+  pinMode(readPin2, INPUT);
 }
 
 void MWInit(void){
   /* This function initializes settings for attenuator, filter and ADC.
    * Attenuator set  to zero value (0 dB) and filter 3 is selected (6 GHz cutoff).
-   * Teensy 3.2 has two ADCs while LC only one. 
+   * Teensy 3.2 has two ADCs while LC only one.
    */
-  
-  PE43711_SPI_tx(att_val);     
+
+  PE43711_SPI_tx(att_val);
   Serial.print("Attentuation set: ");
   Serial.print((float)att_val/4);
   Serial.print(" dB\n");
-  SetSwitch(0b0100); 
+  SetSwitch(0b0100);
   Serial.println("Selected filter 3");
 
   ///// ADC0 ////
@@ -104,27 +108,27 @@ void MWInit(void){
 	// always call the compare functions after changing the resolution!
 	//adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_1), 0, ADC_1); // measurement will be ready if value < 1.0V
 	//adc->enableCompareRange(1.0*adc->getMaxValue(ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_1)/3.3, 0, 1, ADC_1); // ready if value lies out of [1.0,2.0] V
-	#endif	
+	#endif
   	Serial.println("ADC initialized");
 }
 
 void RSSI_Read(void){
 	  //RSSI readout
   value = adc->analogRead(readPin); // read a new value, will return ADC_ERROR_VALUE if the comparison is false.
-  
+
   Serial.print("\nRSSI A: ");
   Serial.println(value*3.3/adc->getMaxValue(ADC_0), DEC);
-  
+
   #if ADC_NUM_ADCS>1
   value2 = adc->analogRead(readPin2, ADC_1);
-  
+
   Serial.print("Pin: ");
   Serial.print(readPin2);
   Serial.print(", value ADC1: ");
   Serial.println(value2*3.3/adc->getMaxValue(ADC_1), DEC);
   #endif
 
-  
+
     /* fail_flag contains all possible errors,
         They are defined in  ADC_Module.h as
 

@@ -5,6 +5,8 @@
 #include <ADC.h>
 // Attenuator settings
 #define PE43711_SS 10  //LE or slave select
+// Power amp power down pin
+#define PWDN 9
 // Pins that control the filter
 #define v1 2
 #define v2 1

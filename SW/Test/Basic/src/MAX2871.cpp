@@ -218,3 +218,11 @@ void MAX2871_Print_Registers(void){
   for (int i = 0; i<6; i++)
     Serial.println(MAX2871_Registers[i], HEX);
 }
+
+void MAX2871_RFA_Power(char power){
+  /* Sets the power to the RF A output */
+  MAX2871_RFA_Disable();
+  MAX2871_Registers[4] &= ~(3 << 3); // "clean" power bits (actually set to min)
+  MAX2871_Registers[4] |= (power << 3); // Set desired value
+  MAX2871_RFA_Enable();
+}

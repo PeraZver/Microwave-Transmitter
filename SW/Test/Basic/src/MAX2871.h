@@ -13,7 +13,7 @@
 #define F_val 0  // 12 bit  fractional divider
 #define M_val 0  // 12 bit modulus value in fractional mode
 #define R_val 1  // 10 bit ref. frequency divider value
-#define DIVA_VAL 0b010 //Sets RFOUT_ output divider mode
+#define DIVA_VAL 0b101 //Sets RFOUT_ output divider mode
 #define CDIV_VAL 192 // 12 bit clock divide value (since fPFD = 19.2 MHz, 19.2MHz/100kHz = 192
 #define B_POWER 0b00 // Sets RFOUTB single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm
 #define A_POWER 0b00 // Sets RFOUTA single-ended output power: 00 = -4dBm, 01 = -1dBm, 10 = +2dBm, 11 = +5dBm
@@ -29,11 +29,11 @@
 #define VCO 0x0 // 6 bit VCO selection
 #define CDIV_MODE 0b00 // clock divide mode: 0b00 mute until lock delay, 01 fast lock enable, 10 phase adjustment, 11 reserved
 #define BS 384
-#define BS_MSB_VAL (BS >> 8) // 2 MSBs of Band select clock divider  
+#define BS_MSB_VAL (BS >> 8) // 2 MSBs of Band select clock divider
 #define BS_LSB_VAL (BS & ~(11 << 8))  // 8 LSBs of band select clock divider
 #define VAS_DLY_VAL 0b00 // VCO Autoselect Delay:  11 when VAS_TEMP=1, 00 when VAS_TEMP=0
 #define LD_VAL 0b00 //  lock-detect pin function: 00 = Low, 01 = Digital lock detect, 10 = Analog lock detect, 11 = High
-#define ADC_MODE 0b001 // ADC mode: 001 temperature, 100 tune pin, 
+#define ADC_MODE 0b001 // ADC mode: 001 temperature, 100 tune pin,
 
 // register 0 masks
 #define EN_INT (1 << 31)    // enables integer mode
@@ -41,7 +41,7 @@
 #define F_DIV (F_val << 3)
 #define REG_0 0b000
 
-// register 1 masks 
+// register 1 masks
 #define CPL (CPL_MODE << 29)  // Sets CP linearity mode
 #define CPT (CPT_MODE << 27) // Sets CP test mode
 #define PHASE (P_val << 15) // Sets phase adjustment
@@ -56,7 +56,7 @@
 #define RDIV2 (1 << 24) //enable reference divide-by-2
 #define R_DIV (R_val << 14) // set reference divider value
 #define REG4DB (1 << 13) // sets double buffer mode
-#define CP_SET  (CP_CURRENT << 9)  // sets CP current 
+#define CP_SET  (CP_CURRENT << 9)  // sets CP current
 #define LDF (1 << 8) // sets lock detecet in integer mode
 #define LDP (1 << 7) //sets lock detect precision
 #define PDP (1 << 6) // phase detect polarity
@@ -70,7 +70,7 @@
 #define VAS_SHDN (1 << 25)  // VAS shutdown mode
 #define VAS_TEMP (1 << 24) // sets VAS temperature compensation
 #define CSM (1 << 18) // enable cycle slip mode
-#define MUTEDEL (1 << 17) // Delay LD to MTLD function to prevent ﬂickering 	
+#define MUTEDEL (1 << 17) // Delay LD to MTLD function to prevent ﬂickering
 #define CDM (CDIV_MODE << 15)  // sets clock divider mode
 #define CDIV (CDIV_VAL << 3) // sets clock divider value
 #define REG_3 0b011
@@ -87,16 +87,16 @@
 #define SDVCO (1 << 11) // sets VCO shutdown mode
 #define MTLD (1 << 10) // Sets RFOUT Mute until Lock Detect Mode
 #define BDIV (1 << 9) // Sets RFOUTB output path select. 0 = VCO divided output, 1 = VCO fundamental frequency
-#define RFB_EN (1 << 8) // Enable RFOUTB output 
+#define RFB_EN (1 << 8) // Enable RFOUTB output
 #define BPWR (B_POWER << 6) //RFOUTB Power
-#define RFA_EN (1 << 5) // Enable RFOUTA output 
+#define RFA_EN (1 << 5) // Enable RFOUTA output
 #define APWR (A_POWER << 3) //RFOUTA Power
 #define REG_4 0b100
 
 // register 5 masks
 #define VAS_DLY (VAS_DLY_VAL << 29) // VCO Autoselect Delay
 #define SDPLL (1 << 25) // Shutdown PLL
-#define F01 (1 << 24) // sets integer mode when F = 0 
+#define F01 (1 << 24) // sets integer mode when F = 0
 #define LD (LD_VAL << 22) // sets lock detection pin function
 #define MUX_5 (MUX_MSB << 18) // sets MSB of MUX bits
 #define ADCS (1 << 6) // Starts ADC mode
@@ -110,7 +110,7 @@
 #define V (0x3F << 3)  // Current VCO
 #define REG_6 0b110
 
-extern uint32_t regInitValues[6]; 
+extern uint32_t regInitValues[6];
 extern uint32_t MAX2871_Registers[6];
 // ADC selection varible
 extern byte adc_mode;  // 001 for temperature, 100 for V tune.
@@ -120,11 +120,12 @@ void MAX2871_Init();
 void MAX2871_SPI_Init();
 void MAX2871_ADC_Init();
 void MAX2871_Read();
-void MAX2871_SPI_tx(uint32_t spi_data); 
+void MAX2871_SPI_tx(uint32_t spi_data);
 void MAX2871_ADC_Reset();
 void MAX2871_RFA_Enable();
 void MAX2871_RFB_Enable();
 void MAX2871_RFA_Disable();
 void MAX2871_RFB_Disable();
 void MAX2871_Print_Registers();
+void MAX2871_RFA_Power(char power);
 #endif

@@ -35,4 +35,5 @@ void SetSwitch(byte selection);
 void MWPins();
 void MWInit();
 void RSSI_Read();
+void SelectFilter(char switchSelect);
 #endif

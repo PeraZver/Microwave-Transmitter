@@ -17,10 +17,10 @@ SPISettings MAX2871_SPISettings(1000000, MSBFIRST, SPI_MODE0);
 
 
 void MAX2871_Init (){
-//Upon power-up, the registers should be programmed
-//twice with at least a 20ms pause between writes.
-//Register programming order should be address 0x05,
-//0x04, 0x03, 0x02, 0x01, and 0x00.
+  //Upon power-up, the registers should be programmed
+  //twice with at least a 20ms pause between writes.
+  //Register programming order should be address 0x05,
+  //0x04, 0x03, 0x02, 0x01, and 0x00.
 
   // Enable MAX3871 chip
   pinMode(MAX2871_CE, OUTPUT);
@@ -144,10 +144,10 @@ void MAX2871_SPI_tx(uint32_t spi_data){
 }
 
 void MAX2871_ADC_Init(void){
-/*
- * Initialize ADC in MAX2871 for temperature or tune voltage readout. Must be
- * sequentially written, otherwise it won't work.
- */
+  /*
+   * Initialize ADC in MAX2871 for temperature or tune voltage readout. Must be
+   * sequentially written, otherwise it won't work.
+   */
    byte ADCM;
    ADCM = adc_mode << 3;
 
@@ -161,7 +161,7 @@ void MAX2871_ADC_Init(void){
 }
 
 void MAX2871_ADC_Reset(void){
-/*
+ /*
  * Apparently ADC won't work if ADCS is constantly on. For that reason, I'll need to reset it after every read.
  */
  MAX2871_Registers[5] &= ~(0b111 << 3);
@@ -225,4 +225,33 @@ void MAX2871_RFA_Power(char power){
   MAX2871_Registers[4] &= ~(3 << 3); // "clean" power bits (actually set to min)
   MAX2871_Registers[4] |= (power << 3); // Set desired value
   MAX2871_RFA_Enable();
+}
+
+void MAX2871_RFA_SetPower(char power){
+
+  switch (power) {
+    case '1':
+        Serial.println("\nSetting power to -4 dBm");
+        MAX2871_RFA_Power(0);
+        break;
+
+    case '2':
+        Serial.println("\nSetting power to -1 dBm");
+        MAX2871_RFA_Power(1);
+        break;
+
+    case '3':
+        Serial.println("\nSetting power to 2 dBm");
+        MAX2871_RFA_Power(2);
+        break;
+
+    case '4':
+        Serial.println("\nSetting power to 5 dBm");
+        MAX2871_RFA_Power(3);
+        break;
+
+    default:
+        ;
+  }
+
 }

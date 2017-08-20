@@ -128,4 +128,5 @@ void MAX2871_RFA_Disable();
 void MAX2871_RFB_Disable();
 void MAX2871_Print_Registers();
 void MAX2871_RFA_Power(char power);
+void MAX2871_RFA_SetPower(char power);
 #endif

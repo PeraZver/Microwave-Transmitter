@@ -83,48 +83,16 @@ void loop() {
          MAX2871_Print_Registers();
          break;
 
-     case 'q':
-         Serial.println("\nSetting power to -4 dBm");
-         MAX2871_RFA_Power(0);
-         break;
+      case 'p':
+          MAX2871_RFA_SetPower(Serial.read());
+          break;
 
-     case 'w':
-         Serial.println("\nSetting power to -1 dBm");
-         MAX2871_RFA_Power(1);
-         break;
-
-     case 'a':
-         Serial.println("\nSetting power to 2 dBm");
-         MAX2871_RFA_Power(2);
-         break;
-
-     case 's':
-         Serial.println("\nSetting power to 5 dBm");
-         MAX2871_RFA_Power(3);
-         break;
-
-      case '1':
-        Serial.println("\nSelected filter 1.\n");
-        SetSwitch(1);
-        break;
-
-      case '2':
-        Serial.println("\nSelected filter 2.\n");
-        SetSwitch(2);
-        break;
-
-      case '3':
-        Serial.println("\nSelected filter 3.\n");
-        SetSwitch(3);
-        break;
-
-      case '4':
-        Serial.println("\nSelected filter 4.\n");
-        SetSwitch(4);
-        break;
+      case 'f':
+          SelectFilter(Serial.read());
+          break;
 
       default:
-          ;
+            ;
     }
   }
 

@@ -32,15 +32,15 @@ void PE43711_SPI_tx(char att){
     digitalWrite(PE43711_SS,HIGH);
     delay(0.001);
     digitalWrite(PE43711_SS,LOW);
-//    delay(1);
-//    digitalWrite(PE43711_SS,HIGH);  // Disable further writing
+    //    delay(1);
+    //    digitalWrite(PE43711_SS,HIGH);  // Disable further writing
     SPI.endTransaction();
     Serial.println("SPI transmission done!");
     delay(20);
 }
 
 void SetSwitch(byte selection){
-/* based on 4 values sets the switch of the filter */
+  /* based on 4 values sets the switch of the filter */
   for (int i = 0; i < 4; i++)
       digitalWrite(pin[i], (selection & (1 << i)));
 }
@@ -64,6 +64,34 @@ void MWPins(void){
   // ADC pins as inputs
   pinMode(readPin, INPUT);
   pinMode(readPin2, INPUT);
+}
+
+void SelectFilter(char switchSelect){
+  /* Select filter based on input char */
+  switch (switchSelect){
+    case '1':
+      Serial.println("\nSelected filter 1.\n");
+      SetSwitch(1);
+      break;
+
+    case '2':
+      Serial.println("\nSelected filter 2.\n");
+      SetSwitch(2);
+      break;
+
+    case '3':
+      Serial.println("\nSelected filter 3.\n");
+      SetSwitch(3);
+      break;
+
+    case '4':
+      Serial.println("\nSelected filter 4.\n");
+      SetSwitch(4);
+      break;
+
+    default:
+      ;
+  }
 }
 
 void MWInit(void){

@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-/*  Basic Microwave transmitter configuration
+/*  Basic Microwave transmitter configuration and test
  *
  *  This example configures sinthesyzer MAX2871, attenuator PE43711 and switch SKY13322.
  *  It also reads ADC value from RSSI detector LMH2120.
@@ -8,14 +8,28 @@
  *
  *
  *  CLK is pin 13
-  * DATA IN is pin 12
-  * DATA OUT is pin 11
-  * LE for MAX2871 is pin 5
-  * CE for MAX2871 is pin 6
+  * DATA IN (MISO) is pin 12
+  * DATA OUT (MOSI) is pin 11
+  * LE (SS) for MAX2871 is pin 5
+  * CE for MAX2871 is pin 4
   * RF EN is pin 7
   * LE for PE43711 is pin 10
+  * PWDN for PA is pin 9
+  * Filter selection is pins from 0 to 3.
   *
-Pero, August 2017
+  * To work with it, use following commands on serial terminal:
+  * g : print current register status
+  * rt: read register 6 with ADC configured to measure temperature
+  * rv: read register 6 with ADC configured to measure VCO voltage
+  * fx: select which filter is active where x is 1,2,3 or 4
+  * px: select MAX2871 output power, where x is 1,2,3 or 4
+  * e : enable RF output
+  * d : disable power output
+  * Nxa: set integer divider where x is between 16 and 65535. 'a' is obligatory
+  * Fxa: set fractional divider where x is between 1 and 4096. 'a' is obligatory
+  *
+  *
+Pero, September 2017
 
 */
 #include <SPI.h>
@@ -55,13 +69,7 @@ void loop() {
     incomingChar = Serial.read();
 
     switch (incomingChar){
-      case 'v':
-          adc_mode = 0b100;
-          break;
 
-      case 't':
-          adc_mode = 0b001;
-          break;
 
       case 'e':
          MAX2871_RFA_Enable();
@@ -74,7 +82,7 @@ void loop() {
          break;
 
       case 'r':
-         MAX2871_Read();
+         MAX2871_Read(Serial.read());   // type t for temperature or v for VCO tuning voltage
          RSSI_Read();
          break;
 
@@ -84,11 +92,28 @@ void loop() {
          break;
 
       case 'p':
-          MAX2871_RFA_SetPower(Serial.read());
+          MAX2871_RFA_SelectPower(Serial.read());
           break;
 
       case 'f':
           SelectFilter(Serial.read());
+          break;
+
+      case 'D':
+          Serial.print("Set output divider value DIVA (0-7): ");
+          MAX2871_SetDIVA(Serial.read());
+          break;
+
+      case 'N':
+          Serial.print("Set integer division value N: ");
+          MAX2871_SetN(String2Int());
+          break;
+
+      case 'F':
+          Serial.println("Fractional mode selected!");
+          MAX2871_SetFracMode();
+          Serial.print("Set fractional division value F: ");
+          MAX2871_SetF(String2Int());
           break;
 
       default:
@@ -103,4 +128,23 @@ void loop() {
 // If you enable interrupts make sure to call readSingle() to clear the interrupt.
 void adc0_isr() {
         adc->adc0->readSingle();
+}
+
+
+
+
+uint16_t String2Int(){
+  /* converts stream of serial input characters to integer*/
+  uint16_t number = 0;
+  char a = '0';
+  while (a != 'a'){
+    if(Serial.available()){
+      a = Serial.read();
+      // Serial.print("\nRead character: ");
+    //  Serial.print(a, DEC);
+      if (a != 'a')
+          number = number*10 + (a - 48);  // in ascii '0' is 48 dec.
+    }
+  }
+  return number;
 }

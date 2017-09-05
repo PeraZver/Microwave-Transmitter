@@ -3,10 +3,10 @@
 //Setting temperature read and MUX readout
 uint32_t regInitValues[6] = { 0x803C0000,
                               0x80000141,
-                              0x00005E42,
+                              0x00005E42 | LDF,
                               0xE8000013,
                               0x618160DC | DIVA,
-                              0x00400005}; // MUX[3] = 1, ADCM = 001, ADCS = 1
+                              0x00400005 }; // MUX[3] = 1, ADCM = 001, ADCS = 1
 
 uint32_t MAX2871_Registers[6] = {0}; //Working registers, that will be changed in code
 // ADC selection varible
@@ -46,7 +46,7 @@ void MAX2871_Init (){
    MAX2871_SPI_Init();
 }
 
-void MAX2871_Read(){
+void MAX2871_Read(char adc_select){
   /*
    * Reading register 6 over SPI. Register contains data from ADC and VCO selection.
    * ADC can read either temperature or VCO tuning voltage.
@@ -59,6 +59,20 @@ void MAX2871_Read(){
    signed char i;
 
    Serial.println("\nSetting MAX2871 ADC ...");
+
+   switch (adc_select){   // Choose whether to read temperature or VCO voltage
+     case 'v':
+         adc_mode = 0b100;
+         break;
+
+     case 't':
+         adc_mode = 0b001;
+         break;
+
+    default:   // default value is read temperature
+        adc_mode = 0b001;
+   }
+
    MAX2871_ADC_Init();
 
    Serial.println("");
@@ -227,7 +241,7 @@ void MAX2871_RFA_Power(char power){
   MAX2871_RFA_Enable();
 }
 
-void MAX2871_RFA_SetPower(char power){
+void MAX2871_RFA_SelectPower(char power){
 
   switch (power) {
     case '1':
@@ -254,4 +268,55 @@ void MAX2871_RFA_SetPower(char power){
         ;
   }
 
+}
+
+void MAX2871_SetN(uint16_t N){
+    /* sets 16 integer divison value N bits in register 0[30:15]*/
+
+    if ((N < 16) || (N > 65535))
+        Serial.println("Selected value invalid!");
+    else{
+        Serial.print("selected N is: ");
+        Serial.print(N);
+        Serial.println("");
+        MAX2871_Registers[0] &= (~N_MASK);
+        MAX2871_Registers[0] |= (N << 15);
+        MAX2871_SPI_tx(MAX2871_Registers[0]);
+    }
+}
+
+void MAX2871_SetF(uint16_t F){
+    /* sets 12 fractional divison value F bits in register 0[14:3]*/
+
+    if (F > 4095)
+        Serial.println("Selected value invalid!");
+    else{
+        Serial.print("selected F is: ");
+        Serial.print(F);
+        Serial.println("");
+        MAX2871_Registers[0] &= (~F_MASK);
+        MAX2871_Registers[0] |= (F << 3 );
+        MAX2871_SPI_tx(MAX2871_Registers[0]);
+    }
+}
+
+void MAX2871_SetDIVA(char diva){
+    /* sets 3 bit integer divison at the RF output DIVA (reg4[22:20])*/
+
+        Serial.print("Divide factor set to: ");
+        Serial.print(1 << (diva-48));
+        Serial.println("");
+        MAX2871_Registers[4] &= (~DIVA_MASK);
+        MAX2871_Registers[4] |= ((diva - 48) << 20);
+        MAX2871_SPI_tx(MAX2871_Registers[4]);
+}
+
+void MAX2871_SetFracMode(){
+   /* Sets MAX2871 to fractional mode */
+   MAX2871_Registers[0] &= ~EN_INT;
+}
+
+void MAX2871_SetIntMode(){
+  /* Sets MAX2871 to integer mode */
+  MAX2871_Registers[0] |= EN_INT;
 }

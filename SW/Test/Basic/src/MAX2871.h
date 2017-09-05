@@ -37,8 +37,10 @@
 
 // register 0 masks
 #define EN_INT (1 << 31)    // enables integer mode
-#define N_DIV (N_val << 15)     // puts value N on its place
-#define F_DIV (F_val << 3)
+#define N_SET (N_val << 15)     // puts value N on its place
+#define N_MASK (0xFFFF << 15)   //16 bits at location 30:15
+#define F_SET (F_val << 3)
+#define F_MASK (0x7F << 3)
 #define REG_0 0b000
 
 // register 1 masks
@@ -82,6 +84,7 @@
 #define SDREF (1 << 26) // shutdown reference input mode
 #define BS_MSB (BS_MSB_VAL << 24) // Sets band select 2 MSBs
 #define FB (1 << 23)  //Sets VCO to N counter feedback mode
+#define DIVA_MASK (7 << 20) // 3 bits at 22:20
 #define DIVA (DIVA_VAL << 20) // Sets RFOUT_ output divider mode. Double buffered by register 0 when REG4DB = 1.
 #define BS_LSB (BS_LSB_VAL << 12) // Sets band select 8 LSBs
 #define SDVCO (1 << 11) // sets VCO shutdown mode
@@ -119,7 +122,7 @@ extern SPISettings MAX2871_SPISettings;
 void MAX2871_Init();
 void MAX2871_SPI_Init();
 void MAX2871_ADC_Init();
-void MAX2871_Read();
+void MAX2871_Read(char adc_select);
 void MAX2871_SPI_tx(uint32_t spi_data);
 void MAX2871_ADC_Reset();
 void MAX2871_RFA_Enable();
@@ -128,5 +131,10 @@ void MAX2871_RFA_Disable();
 void MAX2871_RFB_Disable();
 void MAX2871_Print_Registers();
 void MAX2871_RFA_Power(char power);
-void MAX2871_RFA_SetPower(char power);
+void MAX2871_RFA_SelectPower(char power);
+void MAX2871_SetN(uint16_t N);
+void MAX2871_SetF(uint16_t F);
+void MAX2871_SetDIVA(char diva);
+void MAX2871_SetFracMode();
+void MAX2871_SetIntMode();
 #endif

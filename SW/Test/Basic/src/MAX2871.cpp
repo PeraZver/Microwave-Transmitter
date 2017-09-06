@@ -58,7 +58,7 @@ void MAX2871_Read(char adc_select){
    float data = 0;
    signed char i;
 
-   Serial.println("\nSetting MAX2871 ADC ...");
+   Serial.println("Setting MAX2871 ADC ...");
 
    switch (adc_select){   // Choose whether to read temperature or VCO voltage
      case 'v':
@@ -75,7 +75,6 @@ void MAX2871_Read(char adc_select){
 
    MAX2871_ADC_Init();
 
-   Serial.println("");
    Serial.println("Reading data from MAX2871 ...");
    MAX2871_SPI_tx(spi_data | 6);   // "... last 3 bits must be 110 to indicate register 6."
 
@@ -94,8 +93,7 @@ void MAX2871_Read(char adc_select){
    }
    spi_data = spi_data << 2; //one clk period delay
    Serial.println(spi_data, HEX);
-   Serial.println("Reading done!");
-   Serial.println("");
+   Serial.println("Reading done!\n");
 
    if (spi_data & ADCV)
      Serial.println("ADC data valid!");
@@ -113,9 +111,8 @@ void MAX2871_Read(char adc_select){
       data = 0.315 + 0.0165*ADC_data;
       Serial.print("\nVCO voltage: ");
   }
-
   Serial.print(data);
-  Serial.println("");
+
 
   if (spi_data & VASA)
     Serial.println("VCO Autoselect searching");
@@ -124,7 +121,6 @@ void MAX2871_Read(char adc_select){
 
   Serial.print("Current VCO: ");
   Serial.print((spi_data & V) >> 3);
-  Serial.println("");
 
   MAX2871_ADC_Reset();
 }
@@ -153,7 +149,7 @@ void MAX2871_SPI_tx(uint32_t spi_data){
 
     digitalWrite(MAX2871_SS,HIGH);
     SPI.endTransaction();
-    Serial.println("SPI transmission done!");
+    Serial.println("SPI done!");
     delay(20);
 }
 
@@ -245,22 +241,22 @@ void MAX2871_RFA_SelectPower(char power){
 
   switch (power) {
     case '1':
-        Serial.println("\nSetting power to -4 dBm");
+        Serial.println("Setting power to -4 dBm");
         MAX2871_RFA_Power(0);
         break;
 
     case '2':
-        Serial.println("\nSetting power to -1 dBm");
+        Serial.println("Setting power to -1 dBm");
         MAX2871_RFA_Power(1);
         break;
 
     case '3':
-        Serial.println("\nSetting power to 2 dBm");
+        Serial.println("Setting power to 2 dBm");
         MAX2871_RFA_Power(2);
         break;
 
     case '4':
-        Serial.println("\nSetting power to 5 dBm");
+        Serial.println("Setting power to 5 dBm");
         MAX2871_RFA_Power(3);
         break;
 
@@ -309,6 +305,22 @@ void MAX2871_SetDIVA(char diva){
         MAX2871_Registers[4] &= (~DIVA_MASK);
         MAX2871_Registers[4] |= ((diva - 48) << 20);
         MAX2871_SPI_tx(MAX2871_Registers[4]);
+}
+
+void MAX2871_SetR(uint16_t R){
+    /* sets 16 integer divison value N bits in register 0[30:15]*/
+
+    if (R > 1023)
+        Serial.println("Selected value invalid!");
+    else{
+        Serial.print("selected R is: ");
+        Serial.print(R);
+        Serial.println("");
+        MAX2871_Registers[2] &= (~R_MASK);
+        MAX2871_Registers[2] |= (R << 3);
+        MAX2871_SPI_tx(MAX2871_Registers[2]);
+        MAX2871_SPI_tx(MAX2871_Registers[0]);  // bits R are double buffered
+    }
 }
 
 void MAX2871_SetFracMode(){

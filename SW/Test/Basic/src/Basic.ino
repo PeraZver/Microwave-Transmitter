@@ -73,12 +73,12 @@ void loop() {
 
       case 'e':
          MAX2871_RFA_Enable();
-         Serial.println("\nRFA out activated.\n");
+         Serial.println("RFA out activated.");
          break;
 
       case 'd':
          MAX2871_RFA_Disable();
-         Serial.println("\nRFA out deactivated.\n");
+         Serial.println("RFA out deactivated.");
          break;
 
       case 'r':
@@ -87,7 +87,7 @@ void loop() {
          break;
 
       case 'g':
-         Serial.println("\nMAX2871 Registers printout:");
+         Serial.println("MAX2871 Registers printout:");
          MAX2871_Print_Registers();
          break;
 
@@ -114,6 +114,11 @@ void loop() {
           MAX2871_SetFracMode();
           Serial.print("Set fractional division value F: ");
           MAX2871_SetF(String2Int());
+          break;
+
+      case 'R':
+          Serial.print("Set reference division value R: ");
+          MAX2871_SetR(String2Int());
           break;
 
       default:

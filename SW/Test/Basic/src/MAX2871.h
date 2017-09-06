@@ -40,7 +40,7 @@
 #define N_SET (N_val << 15)     // puts value N on its place
 #define N_MASK (0xFFFF << 15)   //16 bits at location 30:15
 #define F_SET (F_val << 3)
-#define F_MASK (0x7F << 3)
+#define F_MASK (0xFFF << 3)    //12 bits at location 14:3
 #define REG_0 0b000
 
 // register 1 masks
@@ -57,6 +57,7 @@
 #define DBR (1 << 25) //sets reference doubler mode, 0 disable, 1 enable
 #define RDIV2 (1 << 24) //enable reference divide-by-2
 #define R_DIV (R_val << 14) // set reference divider value
+#define R_MASK (0x3FF << 14)
 #define REG4DB (1 << 13) // sets double buffer mode
 #define CP_SET  (CP_CURRENT << 9)  // sets CP current
 #define LDF (1 << 8) // sets lock detecet in integer mode
@@ -134,6 +135,7 @@ void MAX2871_RFA_Power(char power);
 void MAX2871_RFA_SelectPower(char power);
 void MAX2871_SetN(uint16_t N);
 void MAX2871_SetF(uint16_t F);
+void MAX2871_SetR(uint16_t R);
 void MAX2871_SetDIVA(char diva);
 void MAX2871_SetFracMode();
 void MAX2871_SetIntMode();

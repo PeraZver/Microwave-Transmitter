@@ -35,7 +35,7 @@ void PE43711_SPI_tx(char att){
     //    delay(1);
     //    digitalWrite(PE43711_SS,HIGH);  // Disable further writing
     SPI.endTransaction();
-    Serial.println("SPI transmission done!");
+    Serial.println("SPI done!");
     delay(20);
 }
 
@@ -70,22 +70,22 @@ void SelectFilter(char switchSelect){
   /* Select filter based on input char */
   switch (switchSelect){
     case '1':
-      Serial.println("\nSelected filter 1.\n");
+      Serial.println("Selected filter 1.");
       SetSwitch(1);
       break;
 
     case '2':
-      Serial.println("\nSelected filter 2.\n");
+      Serial.println("Selected filter 2.");
       SetSwitch(2);
       break;
 
     case '3':
-      Serial.println("\nSelected filter 3.\n");
+      Serial.println("Selected filter 3.");
       SetSwitch(3);
       break;
 
     case '4':
-      Serial.println("\nSelected filter 4.\n");
+      Serial.println("Selected filter 4.");
       SetSwitch(4);
       break;
 

@@ -52,6 +52,7 @@ if __name__ == "__main__":
                 var = raw_input(">> ")
                 if var:
                     ser.write(var)
+                    ser.write('')
             else:
                 print line,
             

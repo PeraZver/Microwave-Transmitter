@@ -11,7 +11,7 @@ Created on Wed Sep 06 22:33:43 2017
 @author: Pero_2912
 """
 import serial
-#import sys
+import sys
 #import argparse
 #import ast
 import time
@@ -26,7 +26,7 @@ def configure_serial(serial_port):
         parity=serial.PARITY_EVEN if PARITY else serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=0.05
+        timeout=0.5
     )
 
 
@@ -34,6 +34,10 @@ def set_sweep(data):
 # sets sweep
     for i in range(int(data[2]), int(data[3])):    
         ser.write(data[1]+str(i)+'a')
+        line = ser.readline()
+        while (line.strip()):
+            print line.strip()
+            line = ser.readline()            
         time.sleep(1)
         
     
@@ -45,12 +49,14 @@ def command_parser(data):
     elif (user_in[0] == "sweep"):
         set_sweep(user_in)
         return (' ')
+    else:
+        return data
         
         
         
     
 if __name__ == "__main__":   
-    print "Microwave Transmitter Interface"
+    print "Microwave Transmitter Frequency Sweep"
     print "v1.0"
     print "Pero, September 2017"
     
@@ -72,13 +78,11 @@ if __name__ == "__main__":
             if not line.strip():  # evaluates to true when an "empty" line is received
                 var = raw_input(">> ")
                 if var:
-                    ser.write(var)
-                    line = ser.readline()
-                    line = ser.readline()
-                    line = ser.readline()
+                    ser.write(command_parser(var))
             else:
                 print line,
             
         except KeyboardInterrupt:
             ser.close()
+            sys.exit(0)
             break

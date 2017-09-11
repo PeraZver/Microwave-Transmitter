@@ -117,8 +117,13 @@ void loop() {
           break;
 
       case 'R':
-          Serial.print("Set reference division value R: ");
+          Serial.print("Set reference divider value R: ");
           MAX2871_SetR(String2Int());
+          break;
+
+      case 'M':
+          Serial.print("Set modulus division value M: ");
+          MAX2871_SetM(String2Int());
           break;
 
       default:

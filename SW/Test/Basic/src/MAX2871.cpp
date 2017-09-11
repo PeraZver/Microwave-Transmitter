@@ -93,7 +93,7 @@ void MAX2871_Read(char adc_select){
    }
    spi_data = spi_data << 2; //one clk period delay
    Serial.println(spi_data, HEX);
-   Serial.println("Reading done!\n");
+   Serial.println("Reading done!");
 
    if (spi_data & ADCV)
      Serial.println("ADC data valid!");
@@ -115,13 +115,13 @@ void MAX2871_Read(char adc_select){
 
 
   if (spi_data & VASA)
-    Serial.println("VCO Autoselect searching");
+    Serial.println("\nVCO Autoselect searching");
   else
-    Serial.println("VAS Completed");
+    Serial.println("\nVAS Completed");
 
   Serial.print("Current VCO: ");
-  Serial.print((spi_data & V) >> 3);
-
+  Serial.println((spi_data & V) >> 3);
+  //Serial.println("Reseting ADC");
   MAX2871_ADC_Reset();
 }
 
@@ -317,9 +317,25 @@ void MAX2871_SetR(uint16_t R){
         Serial.print(R);
         Serial.println("");
         MAX2871_Registers[2] &= (~R_MASK);
-        MAX2871_Registers[2] |= (R << 3);
+        MAX2871_Registers[2] |= (R << 14);
         MAX2871_SPI_tx(MAX2871_Registers[2]);
         MAX2871_SPI_tx(MAX2871_Registers[0]);  // bits R are double buffered
+    }
+}
+
+void MAX2871_SetM(uint16_t M){
+    /* sets 16 integer divison value N bits in register 0[30:15]*/
+
+    if ((M < 2) || (M > 4095))
+        Serial.println("Selected value invalid!");
+    else{
+        Serial.print("selected M is: ");
+        Serial.print(M);
+        Serial.println("");
+        MAX2871_Registers[1] &= (~M_MASK);
+        MAX2871_Registers[1] |= (M << 3);
+        MAX2871_SPI_tx(MAX2871_Registers[1]);
+        MAX2871_SPI_tx(MAX2871_Registers[0]);  // bits M are double buffered
     }
 }
 

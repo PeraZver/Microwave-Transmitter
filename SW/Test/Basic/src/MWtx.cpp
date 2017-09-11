@@ -144,7 +144,7 @@ void RSSI_Read(void){
 	  //RSSI readout
   value = adc->analogRead(readPin); // read a new value, will return ADC_ERROR_VALUE if the comparison is false.
 
-  Serial.print("\nRSSI A: ");
+  Serial.print("RSSI A: ");
   Serial.println(value*3.3/adc->getMaxValue(ADC_0), DEC);
 
   #if ADC_NUM_ADCS>1

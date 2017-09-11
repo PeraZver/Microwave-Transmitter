@@ -48,6 +48,7 @@
 #define CPT (CPT_MODE << 27) // Sets CP test mode
 #define PHASE (P_val << 15) // Sets phase adjustment
 #define MODULUS (M_val << 3)  // sets modulus value
+#define M_MASK (0xFFF << 3)  // mask for M bits
 #define REG_1 0b001
 
 // register 2 masks
@@ -136,6 +137,7 @@ void MAX2871_RFA_SelectPower(char power);
 void MAX2871_SetN(uint16_t N);
 void MAX2871_SetF(uint16_t F);
 void MAX2871_SetR(uint16_t R);
+void MAX2871_SetM(uint16_t M);
 void MAX2871_SetDIVA(char diva);
 void MAX2871_SetFracMode();
 void MAX2871_SetIntMode();

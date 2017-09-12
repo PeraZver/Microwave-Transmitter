@@ -38,7 +38,7 @@ void reg0(void){
 	if(scanf("%x", &reg0)){
 		printf("INT enable: %u \n", (reg0 & EN_INT) != 0 );
 		printf("N: %u \n", (reg0 & (0xFFFF << 15)) >> 15);
-		printf("F: %u \n", (reg0 & (0xFFF << 3) >> 3) );	
+		printf("F: %u \n", (reg0 & (0xFFF << 3)) >> 3 );	
 	}
 }
 
@@ -49,7 +49,7 @@ void reg1(void){
 		printf("CPL: %u \n",(reg1 & (0b11 << 29)) >> 29);
 		printf("CPT: %u \n",(reg1 & (0b11 << 27)) >> 27);
 		printf("P: %u \n", (reg1 & (0xFFF << 15)) >> 15);
-		printf("M: %u \n", (reg1 & (0xFFF << 3) >> 3) );	
+		printf("M: %u \n", (reg1 & (0xFFF << 3)) >> 3 );	
 	}
 }
 

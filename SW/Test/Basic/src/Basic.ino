@@ -40,6 +40,10 @@ Pero, September 2017
 // user input
 char incomingChar = 0;  //Serial input
 
+// sweep parameters
+uint16_t a, b, dt;
+char divider_type;
+
 void setup() {
   Serial.begin(9600);
   while (!Serial.available()) ;
@@ -100,30 +104,47 @@ void loop() {
           break;
 
       case 'D':
-          Serial.print("Set output divider value DIVA (0-7): ");
+          //Serial.print("Set output divider value DIVA (0-7): ");
           MAX2871_SetDIVA(Serial.read());
           break;
 
       case 'N':
-          Serial.print("Set integer division value N: ");
+          //Serial.print("Set integer division value N: ");
           MAX2871_SetN(String2Int());
           break;
 
       case 'F':
           Serial.println("Fractional mode selected!");
           MAX2871_SetFracMode();
-          Serial.print("Set fractional division value F: ");
+          //Serial.print("Set fractional division value F: ");
           MAX2871_SetF(String2Int());
           break;
 
       case 'R':
-          Serial.print("Set reference divider value R: ");
+          //Serial.print("Set reference divider value R: ");
           MAX2871_SetR(String2Int());
           break;
 
       case 'M':
-          Serial.print("Set modulus division value M: ");
+          //Serial.print("Set modulus division value M: ");
           MAX2871_SetM(String2Int());
+          break;
+
+      case 's':
+          divider_type = Serial.read();  // N or F
+          a = String2Int();   // lower limit
+          b = String2Int();   // upper limit
+          dt = String2Int();  //time delay
+          Serial.println("Frequency Sweep activated.");
+          Serial.print(divider_type);
+          Serial.print(" from ");
+          Serial.print(a);
+          Serial.print(" to ");
+          Serial.print(b);
+          Serial.print(" in steps of ");
+          Serial.print(dt);
+          Serial.println(" ms.");
+          MAX2871_Sweep(divider_type, a, b, dt);
           break;
 
       default:
@@ -144,7 +165,8 @@ void adc0_isr() {
 
 
 uint16_t String2Int(){
-  /* converts stream of serial input characters to integer*/
+  /* converts stream of serial input characters to integer.
+     Condition is that stream ends with 'a'. */
   uint16_t number = 0;
   char a = '0';
   while (a != 'a'){

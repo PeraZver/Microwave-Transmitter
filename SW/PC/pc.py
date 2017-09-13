@@ -30,16 +30,6 @@ def configure_serial(serial_port):
     )
 
 
-def set_sweep(data):
-# sets sweep
-    for i in range(int(data[2]), int(data[3])):    
-        ser.write(data[1]+str(i)+'a')
-        line = ser.readline()
-        while (line.strip()):
-            print line.strip()
-            line = ser.readline()            
-        time.sleep(1)
-
 def read_registers():
 # Reads and parses registers from MAX2871
     ser.write('g')
@@ -93,8 +83,7 @@ def command_parser(data):
     elif (user_in[0] == 'D'):
         return ('D'+user_in[1])
     elif (user_in[0] == "sweep"):
-        set_sweep(user_in)
-        return (' ')
+        return ('s'+user_in[1] + user_in[2] + 'a'+ user_in[3]+'a' + user_in[4]+'a')
     elif (user_in[0] == 'g'):
         read_registers()
         return (' ')

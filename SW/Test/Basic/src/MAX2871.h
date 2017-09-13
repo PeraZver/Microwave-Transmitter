@@ -141,4 +141,5 @@ void MAX2871_SetM(uint16_t M);
 void MAX2871_SetDIVA(char diva);
 void MAX2871_SetFracMode();
 void MAX2871_SetIntMode();
+void MAX2871_Sweep(char divider_type, uint16_t a, uint16_t b, uint16_t dt);
 #endif

@@ -348,3 +348,23 @@ void MAX2871_SetIntMode(){
   /* Sets MAX2871 to integer mode */
   MAX2871_Registers[0] |= EN_INT;
 }
+
+void MAX2871_Sweep(char divider_type, uint16_t a, uint16_t b, uint16_t dt){
+  /* Sweeps value of N or F between a and b */
+  uint16_t i = 0;
+
+  if (divider_type == 'N') {
+    for (i = a; i < b; i ++){
+      MAX2871_SetN(i);
+      delay(dt);
+    }
+  }
+  else if (divider_type == 'F') {
+    for (i = a; i < b; i ++){
+      MAX2871_SetF(i);
+      delay(dt);
+    }
+  }
+  else ;
+
+}

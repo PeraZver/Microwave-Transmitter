@@ -14,9 +14,10 @@ Use following commands:
 
   To change frequency settings, use following commands:
    * `N x` - set integer divider where x is between 16 and 65535.
-   * `M x` - set fractional modulus where x is between 1 and 4096.
+   * `M x` - set fractional modulus where x is between 2 and 4095.
    * `F x` - set fractional divider where x is between 1 and M.
+   * `R x` - set reference divider where x is between 1 and 1023.
    * `D x` - set output divider where x is between 1 and 7.
 
- Special spice is function `sweep`, that enables sweep of every parameter:
-  * `sweep x a b` - x can be N, F or M, a is lower limit and b is the upper.
+ Special spice is function `sweep`, that enables sweep of every parameter (but will work only with F and N):
+  * `sweep x a b dt` - x can be N or F, a is lower limit, b is the upper and dt is time resolution in ms.

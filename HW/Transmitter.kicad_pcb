@@ -1,4 +1,4 @@
-(kicad_pcb (version 4) (host pcbnew 4.0.4-stable)
+(kicad_pcb (version 4) (host pcbnew 4.0.6)
 
   (general
     (links 397)
@@ -563,7 +563,7 @@
       (net 56 "Net-(D3-Pad1)"))
     (pad 2 smd rect (at 1.36 -0.1 90) (size 1.34 1.8) (layers F.Cu F.Paste F.Mask)
       (net 2 GND))
-    (model Diodes_SMD.3dshapes/SOD-323.wrl
+    (model Diodes_SMD.3dshapes/D_SOD-323.wrl
       (at (xyz 0 0 0))
       (scale (xyz 1.5 1.5 1.5))
       (rotate (xyz 0 0 0))
@@ -695,7 +695,7 @@
       (net 93 "Net-(R2-Pad1)"))
     (pad 1 thru_hole rect (at -16.51 -7.62 90) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask B.SilkS)
       (net 2 GND))
-    (model "D:/Building a VNA/HW/kicad_teensy-master/Teensy_3-2.wrl"
+    (model "D:/Elektronika/Microwave Transmitter/HW/kicad_teensy-master/Teensy_3-2.wrl"
       (at (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -1854,9 +1854,9 @@
       (net 42 "/Power Supply/12V_IN"))
     (pad 2 thru_hole circle (at -5.9 0 180) (size 4.2 4.2) (drill 3.05) (layers *.Cu *.Mask F.SilkS)
       (net 2 GND))
-    (model Connect.3dshapes/JACK_ALIM.wrl
-      (at (xyz -0.25 0 0))
-      (scale (xyz 1 1 1))
+    (model Connectors.3dshapes/JACK_ALIM.wrl
+      (at (xyz -0.225 0 0))
+      (scale (xyz 0.85 0.85 0.85))
       (rotate (xyz 0 0 270))
     )
   )
@@ -1880,7 +1880,7 @@
       (net 55 "Net-(D2-Pad1)"))
     (pad 2 smd rect (at 1.36 -0.1 90) (size 1.34 1.8) (layers F.Cu F.Paste F.Mask)
       (net 2 GND))
-    (model Diodes_SMD.3dshapes/SOD-323.wrl
+    (model Diodes_SMD.3dshapes/D_SOD-323.wrl
       (at (xyz 0 0 0))
       (scale (xyz 1.5 1.5 1.5))
       (rotate (xyz 0 0 0))
@@ -2230,6 +2230,11 @@
       (net 2 GND) (zone_connect 2))
     (pad 2 thru_hole circle (at -1.75 2.1) (size 0.5 0.5) (drill 0.25) (layers *.Cu *.Mask F.SilkS)
       (net 2 GND) (zone_connect 2))
+    (model "D:/Elektronika/Microwavino/HW/3d/User Library-RP_SMA_PCB-1.wrl"
+      (at (xyz 0.08 0 0.01))
+      (scale (xyz 250 250 250))
+      (rotate (xyz 0 180 90))
+    )
   )
 
   (module VNA:ASTRX-12 placed (layer F.Cu) (tedit 569A81B5) (tstamp 58AD8957)
@@ -2254,6 +2259,11 @@
       (net 2 GND))
     (pad 4 smd rect (at 1.08 -0.7) (size 0.63 0.84) (layers F.Cu F.Paste F.Mask)
       (net 67 /CLK_REF))
+    (model Crystals.3dshapes/Crystal_SMD_2520-4pin_2.5x2.0mm.wrl
+      (at (xyz 0 0 0))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 0 0))
+    )
   )
 
   (module VNA:VQFN-24 placed (layer F.Cu) (tedit 5648A4F4) (tstamp 58AD8981)

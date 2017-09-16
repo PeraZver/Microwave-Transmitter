@@ -1,12 +1,12 @@
 #include <MAX2871.h>
 
 //Setting temperature read and MUX readout
-uint32_t regInitValues[6] = { 0x803C0000,
+uint32_t regInitValues[6] = { EN_INT | N_SET | F_SET | REG_0,
                               0x80000141,
                               0x00005E42 | LDF,
                               0xE8000013,
                               0x618160DC | DIVA,
-                              0x00400005 }; // MUX[3] = 1, ADCM = 001, ADCS = 1
+                              0x00400005 | F01}; // MUX[3] = 1, ADCM = 001, ADCS = 1
 
 uint32_t MAX2871_Registers[6] = {0}; //Working registers, that will be changed in code
 // ADC selection varible
@@ -139,8 +139,8 @@ void MAX2871_SPI_tx(uint32_t spi_data){
        //Serial.println(spi_package[i], HEX);
     }
 
-    Serial.println("Sending data to MAX2871: ");
-    Serial.println(spi_data, HEX);
+    //Serial.println("Sending data to MAX2871: ");
+    //Serial.println(spi_data, HEX);
     digitalWrite(MAX2871_SS,LOW);
     SPI.beginTransaction(MAX2871_SPISettings);
 
@@ -149,7 +149,7 @@ void MAX2871_SPI_tx(uint32_t spi_data){
 
     digitalWrite(MAX2871_SS,HIGH);
     SPI.endTransaction();
-    Serial.println("SPI done!");
+    //Serial.println("SPI done!");
     delay(20);
 }
 
@@ -342,11 +342,17 @@ void MAX2871_SetM(uint16_t M){
 void MAX2871_SetFracMode(){
    /* Sets MAX2871 to fractional mode */
    MAX2871_Registers[0] &= ~EN_INT;
+   MAX2871_Registers[2] &= ~LDF;
+   MAX2871_SPI_tx(MAX2871_Registers[2]);
+   MAX2871_SPI_tx(MAX2871_Registers[0]);
 }
 
 void MAX2871_SetIntMode(){
   /* Sets MAX2871 to integer mode */
   MAX2871_Registers[0] |= EN_INT;
+  MAX2871_Registers[2] |= LDF;
+  MAX2871_SPI_tx(MAX2871_Registers[2]);
+  MAX2871_SPI_tx(MAX2871_Registers[0]);
 }
 
 void MAX2871_Sweep(char divider_type, uint16_t a, uint16_t b, uint16_t dt){

@@ -47,7 +47,7 @@
 #define CPL (CPL_MODE << 29)  // Sets CP linearity mode
 #define CPT (CPT_MODE << 27) // Sets CP test mode
 #define PHASE (P_val << 15) // Sets phase adjustment
-#define MODULUS (M_val << 3)  // sets modulus value
+#define M_SET (M_val << 3)  // sets modulus value
 #define M_MASK (0xFFF << 3)  // mask for M bits
 #define REG_1 0b001
 

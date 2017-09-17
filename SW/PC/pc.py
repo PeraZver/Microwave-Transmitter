@@ -19,7 +19,7 @@ import bitstring as bit
 
 f_REF = 19.2  # Reference frequency
 params = {'R':1, 'N':120, 'F':0.0, 'M':40, 'D':5}  # frequency settings parameters
-
+f_PDF = f_REF/params['R'] 
 
 
 BAUDRATE = 9600
@@ -32,12 +32,12 @@ def configure_serial(serial_port):
         parity=serial.PARITY_EVEN if PARITY else serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=0.75
-    )
+        timeout=0.75)
       
 def check_frequency (freq_dict):
 # Function that calculates frequency based on PLL parameters 
-# First test if we're somewhere where it's not allowed to be in    
+# First test if we're somewhere where it's not allowed to be in   
+    global f_PDF 
     if (freq_dict['R'] < 1) | (freq_dict['R'] > 1023):
         print 'R must be between 1 and 1023'
         return 0    
@@ -66,6 +66,42 @@ def check_frequency (freq_dict):
     print 'f_RFOUT is ' + str(f_RFOUT) + ' MHz'
     return 1
     
+
+    
+def select_D(freq):
+#    Selects D parameter based on desired frequency output
+    if   3000 < freq <= 6000:
+        return 0
+    elif 1500 < freq <= 3000:
+        return 1
+    elif 750  < freq <= 1500:
+        return 2    
+    elif 375  < freq <= 750:
+        return 3    
+    elif 187.5 < freq <= 375:
+        return 4
+    elif 93.75 < freq <= 187.5:
+        return 5
+    elif 46.875 < freq <= 93.75:
+        return 6        
+    elif 23.5 < freq <=  46.875:
+        return 7
+        
+def set_frequency_INT(freq):
+    # sets  integer mode paramteres for given frequency
+    D = select_D(freq) # we need parameter D first
+    f_VCO = freq * 2**D  # this is what VCO will need to generate    
+    N = int(f_VCO/f_PDF)
+    return N, D
+
+def set_frequency_FRAC(freq):
+    # sets  integer mode paramteres for given frequency
+    D = select_D(freq) # we need parameter D first
+    f_VCO = freq * 2**D  # this is what VCO will need to generate    
+    N = int(f_VCO/f_PDF)
+    F = int((f_VCO/f_PDF - N)*params['M'])
+    return N, D, F
+
         
 def read_registers(ser):
 # Reads and parses registers from MAX2871
@@ -80,7 +116,7 @@ def read_registers(ser):
         print 'Register ' + str(i)
         parse_register(line.strip(), i)
         print ' '
-                
+#    Update paramters that set frequency            
     check_frequency(params)
 
 def parse_register(line, i):
@@ -137,7 +173,29 @@ def command_parser(data, ser):
         
     elif (user_in[0] == 'g'):
         read_registers(ser)
-        return (' ')
+        return ('')
+    
+    elif (user_in[0] == 'FINT'):  # Set frequency in integer mode
+        N, D = set_frequency_INT(int(user_in[1]))
+        ser.write('D'+str(D))
+        ser.write('N'+str(N)+'a')
+        ser.write('F0a')  # Kill fractional mode
+        for i in range(1,6):
+            line = ser.readline()
+            if  line.strip():  # evaluates to true when an "empty" line is received
+                print line.strip()
+        return ('')
+        
+    elif (user_in[0] == 'FFRA'):  # Set frequency in fractional mode
+        N, D, F = set_frequency_FRAC(float(user_in[1]))
+        ser.write('D'+str(D))
+        ser.write('N'+str(N)+'a')
+        ser.write('F'+str(F)+'a')        
+        for i in range(1,6):
+            line = ser.readline()
+            if  (line.strip() != ''):
+                print line.strip()
+        return ('') 
         
     elif (user_in[0] == 'help'):
         read_help(user_in)
@@ -177,7 +235,7 @@ def main():
                     ser.write(command_parser(var, ser))
 
             else:
-                print line,
+                print line
             
         except KeyboardInterrupt:
             ser.close()

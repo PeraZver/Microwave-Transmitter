@@ -17,7 +17,7 @@ import bitstring as bit
 #import time
 
 
-f_REF = 19.6  # Reference frequency
+f_REF = 19.2  # Reference frequency
 params = {'R':1, 'N':120, 'F':0.0, 'M':40, 'D':5}  # frequency settings parameters
 
 
@@ -32,10 +32,11 @@ def configure_serial(serial_port):
         parity=serial.PARITY_EVEN if PARITY else serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=0.1
+        timeout=0.75
     )
-
-def frequency (freq_dict):
+      
+def check_frequency (freq_dict):
+# Function that calculates frequency based on PLL parameters 
 # First test if we're somewhere where it's not allowed to be in    
     if (freq_dict['R'] < 1) | (freq_dict['R'] > 1023):
         print 'R must be between 1 and 1023'
@@ -51,11 +52,9 @@ def frequency (freq_dict):
         return 0
 # Calculate frequency from the given params        
     f_PDF = f_REF/freq_dict['R']
-# Now check if N is somewhere where we won't be able to control VCOs. It must 
-# be high enough that (f_VCO/N - f_PFD) passes through loop filter. It also must be
-# high enough that oscillator frequency is within 3-6 GHz.
-    N_min = int(round(max(3000/abs(f_PDF - 0.776), 3000/f_PDF)))
-    N_max = int(round(max(6000/abs(f_PDF - 0.776), 6000/f_PDF)))
+# Now check if N is somewhere where we won't be able to control VCOs.
+    N_min = int(round(3000/f_PDF))
+    N_max = int(round(6000/f_PDF))
     if ((freq_dict['N'] < N_min) | (freq_dict['N'] > N_max)):
         print 'N must be between '+ str(N_min) + ' and '+ str(N_max)
         return 0
@@ -68,7 +67,7 @@ def frequency (freq_dict):
     return 1
     
         
-def read_registers():
+def read_registers(ser):
 # Reads and parses registers from MAX2871
     ser.write('g')
     while(True):
@@ -82,7 +81,7 @@ def read_registers():
         parse_register(line.strip(), i)
         print ' '
                 
-    frequency(params)
+    check_frequency(params)
 
 def parse_register(line, i):
 #parses each register and displays values in human form  
@@ -119,26 +118,30 @@ def parse_register(line, i):
             params['D'] = reg[9:12].uint
 
     
-def command_parser(data):
+def command_parser(data, ser):
 # function that converts user input to Teensy commands
     user_in = data.split(' ');
 
     if user_in[0] in ['N', 'F', 'M', 'R']:
         params[user_in[0]] = int(user_in[1])
-        frequency(params)  # update frequecy settings
+        check_frequency(params)  # update frequecy settings
         return (user_in[0]+user_in[1]+'a')
             
     elif (user_in[0] == 'D'):
         params['D'] = int(user_in[1])
-        frequency(params)
+        check_frequency(params)
         return ('D'+user_in[1])
         
     elif (user_in[0] == "sweep"):
         return ('s'+user_in[1] + user_in[2] + 'a'+ user_in[3]+'a' + user_in[4]+'a')
         
     elif (user_in[0] == 'g'):
-        read_registers()
+        read_registers(ser)
         return (' ')
+        
+    elif (user_in[0] == 'help'):
+        read_help(user_in)
+        return('')
         
     else:
         return data
@@ -146,9 +149,11 @@ def command_parser(data):
         
         
     
-if __name__ == "__main__":   
-    print "Microwave Transmitter Frequency Sweep"
-    print "v1.0"
+    
+def main():
+    print "Microwavino Interface"
+    print "v1.1"
+    print "type 'help [command]' if not sure how to proceed\n"
     print "Pero, September 2017"
     
     try:
@@ -156,7 +161,7 @@ if __name__ == "__main__":
         if not ser.isOpen():
             raise Exception
         else:
-            print "Serial port opened"
+            print "\nSerial port opened"
             print "Initializing Microwave transmitter...\n"
             ser.write(' ')
     except:
@@ -169,7 +174,7 @@ if __name__ == "__main__":
             if not line.strip():  # evaluates to true when an "empty" line is received
                 var = raw_input(">> ")
                 if var:
-                    ser.write(command_parser(var))
+                    ser.write(command_parser(var, ser))
 
             else:
                 print line,
@@ -178,3 +183,57 @@ if __name__ == "__main__":
             ser.close()
             sys.exit(1)
             break
+
+    
+def read_help(*args):
+# displays help for each command
+    if (len(args[0]) > 1):
+        command = args[0][1]
+    else:
+        command = args[0][0]
+
+    if (command == 'D'):
+        print """ 
+        Output frequency divider (DIVA):
+        0 = Divide by 1, if 3000MHz ≤ fRFOUTA ≤ 6000MHz
+        1 = Divide by 2, if 1500MHz ≤ fRFOUTA< 3000MHz
+        2 = Divide by 4, if 750MHz ≤ fRFOUTA < 1500MHz
+        3 = Divide by 8, if 375MHz ≤ fRFOUTA < 750MHz
+        4 = Divide by 16, if 187.5MHz ≤ fRFOUTA < 375MHz
+        5 = Divide by 32, if 93.75MHz ≤ fRFOUTA < 187.5MHz
+        6 = Divide by 64, if 46.875MHz ≤ fRFOUTA < 93.75MHz
+        7 = Divide by 128, if 23.5MHz ≤ fRFOUTA< 46.875MHz"""
+        
+    elif (command == 'sweep'):
+        print """ 
+        function SWEEP X a b dt
+        sweeps parameter X from a to b with resolution of dt milliseconds."""
+    
+    elif (command == 'g'):
+        print """ 
+        command g displays current content of registers 0 - 5 of MAX2871."""
+    
+    else:
+        print """ 
+        COMMAND LIST:
+        -----------------------------------------------
+        g - read MAX2871 register content
+        rt - read MAX2871 ADC set to temperature readout
+        rv - read MAX2871 ADC set to VCO voltage readout
+        e - activate RF output
+        d - deactivate RF output
+        px - sets the power of RF output, where {x} can be 1,2,3 or 4.
+        fx - selects the filter, where {x} can be 1,2,3 or 4.
+        
+        To change frequency settings, use following commands:
+        
+        N x - set integer divider where x is between 16 and 65535.
+        M x - set fractional modulus where x is between 2 and 4095.
+        F x - set fractional divider where x is between 1 and M.
+        R x - set reference divider where x is between 1 and 1023.
+        D x - set output divider where x is between 1 and 7.
+        
+        sweep x a b dt - sweep parameters from a to b."""        
+        
+if __name__ == "__main__":   
+    main()

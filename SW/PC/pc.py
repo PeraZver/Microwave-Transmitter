@@ -18,7 +18,7 @@ import bitstring as bit
 
 
 f_REF = 19.2  # Reference frequency
-params = {'R':1, 'N':120, 'F':0.0, 'M':40, 'D':5}  # frequency settings parameters
+params = {'R':1, 'N':200, 'F':0.0, 'M':100, 'D':5}  # frequency settings parameters
 f_PDF = f_REF/params['R'] 
 
 
@@ -32,7 +32,7 @@ def configure_serial(serial_port):
         parity=serial.PARITY_EVEN if PARITY else serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=0.75)
+        timeout=0.85)
       
 def check_frequency (freq_dict):
 # Function that calculates frequency based on PLL parameters 
@@ -102,6 +102,24 @@ def set_frequency_FRAC(freq):
     F = int((f_VCO/f_PDF - N)*params['M'])
     return N, D, F
 
+
+def set_param_sweep(args):
+#    returns command that starts given parameter sweep
+    param = args[1]
+    start = args[2]
+    stop  = args[3]
+    if (len(args) == 5):
+        td = args[4]
+    else:
+        td = '10'    
+    return ('s'+ param + start + 'a'+ stop +'a' + td +'a')
+    
+def freq_sweep(f_start, f_stop):
+#    set frequency sweep from f_start to f_stop
+    N_start, D_start = set_frequency_INT(f_start)
+    N_stop, D_stop = set_frequency_INT(f_stop)
+    return (set_param_sweep(('sweep','N', str(N_start), str(N_stop))))
+
         
 def read_registers(ser):
 # Reads and parses registers from MAX2871
@@ -168,8 +186,8 @@ def command_parser(data, ser):
         check_frequency(params)
         return ('D'+user_in[1])
         
-    elif (user_in[0] == "sweep"):
-        return ('s'+user_in[1] + user_in[2] + 'a'+ user_in[3]+'a' + user_in[4]+'a')
+    elif (user_in[0] in ("sweep", "SWEEP")):
+        return set_param_sweep(user_in)
         
     elif (user_in[0] == 'g'):
         read_registers(ser)
@@ -186,7 +204,7 @@ def command_parser(data, ser):
                 print line.strip()
         return ('')
         
-    elif (user_in[0] == 'FFRA'):  # Set frequency in fractional mode
+    elif (user_in[0] == 'FFRAC'):  # Set frequency in fractional mode
         N, D, F = set_frequency_FRAC(float(user_in[1]))
         ser.write('D'+str(D))
         ser.write('N'+str(N)+'a')
@@ -235,7 +253,7 @@ def main():
                     ser.write(command_parser(var, ser))
 
             else:
-                print line
+                print line.strip()
             
         except KeyboardInterrupt:
             ser.close()
@@ -264,12 +282,20 @@ def read_help(*args):
         
     elif (command == 'sweep'):
         print """ 
-        function SWEEP X a b dt
-        sweeps parameter X from a to b with resolution of dt milliseconds."""
+        function SWEEP X a b [dt]
+        sweeps parameter X from a to b with resolution of dt milliseconds. 
+        Default value for dt is 10 ms. """
     
     elif (command == 'g'):
         print """ 
         command g displays current content of registers 0 - 5 of MAX2871."""
+        
+    elif (command == 'r'):
+        print """
+        Readout of MAX2871 register 6. Internal ADC of MAX2871 can be configured
+        to measure temperature or voltage at the VCO:
+        rt - display temperature value.
+        rv - display VCO voltage. """
     
     else:
         print """ 
@@ -290,6 +316,13 @@ def read_help(*args):
         F x - set fractional divider where x is between 1 and M.
         R x - set reference divider where x is between 1 and 1023.
         D x - set output divider where x is between 1 and 7.
+        
+        To change frequency directly, use two functions:
+        
+        FINT x - set frequency x in integer mode
+        FFRAC x - set frequency x in fractional mode
+        
+        To sweep parameters, try this:
         
         sweep x a b dt - sweep parameters from a to b."""        
         

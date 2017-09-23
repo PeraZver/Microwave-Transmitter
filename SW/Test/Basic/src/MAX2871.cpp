@@ -2,7 +2,7 @@
 
 //Setting temperature read and MUX readout
 uint32_t regInitValues[6] = { EN_INT | N_SET | F_SET | REG_0,
-                              0x80000141,
+                              CPL | CPT | PHASE | M_SET | REG_1,
                               0x00005E42 | LDF,
                               0xE8000013,
                               0x618160DC | DIVA,
@@ -287,9 +287,9 @@ void MAX2871_SetF(uint16_t F){
     if (F > 4095)
         Serial.println("Selected value invalid!");
     else{
-        Serial.print("selected F is: ");
-        Serial.print(F);
-        Serial.println("");
+        // Serial.print("selected F is: ");
+        // Serial.print(F);
+        // Serial.println("");
         MAX2871_Registers[0] &= (~F_MASK);
         MAX2871_Registers[0] |= (F << 3 );
         MAX2871_SPI_tx(MAX2871_Registers[0]);

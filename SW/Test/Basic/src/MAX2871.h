@@ -9,9 +9,9 @@
 #define clkPin      13  // clk pin
 
 // this parameters should be changed to suit the application
-#define N_val 100  // (16 bit feedback divider factor in integer mode
+#define N_val 200  // (16 bit feedback divider factor in integer mode
 #define F_val 0  // 12 bit  fractional divider
-#define M_val 0  // 12 bit modulus value in fractional mode
+#define M_val 100  // 12 bit modulus value in fractional mode
 #define R_val 1  // 10 bit ref. frequency divider value
 #define DIVA_VAL 0b101 //Sets RFOUT_ output divider mode
 #define CDIV_VAL 192 // 12 bit clock divide value (since fPFD = 19.2 MHz, 19.2MHz/100kHz = 192

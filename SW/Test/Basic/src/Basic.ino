@@ -15,20 +15,8 @@
   * RF EN is pin 7
   * LE for PE43711 is pin 10
   * PWDN for PA is pin 9
-  * Filter selection is pins from 0 to 3.
-  *
-  * To work with it, use following commands on serial terminal:
-  * g : print current register status
-  * rt: read register 6 with ADC configured to measure temperature
-  * rv: read register 6 with ADC configured to measure VCO voltage
-  * fx: select which filter is active where x is 1,2,3 or 4
-  * px: select MAX2871 output power, where x is 1,2,3 or 4
-  * e : enable RF output
-  * d : disable power output
-  * Nxa: set integer divider where x is between 16 and 65535. 'a' is obligatory
-  * Fxa: set fractional divider where x is between 1 and 4096. 'a' is obligatory
-  *
-  *
+  * Filter selection is pins 0 to 3.
+
 Pero, September 2017
 
 */
@@ -43,6 +31,9 @@ char incomingChar = 0;  //Serial input
 // sweep parameters
 uint16_t a, b, dt;
 char divider_type;
+
+//fractional mode flag
+boolean frac = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -114,8 +105,10 @@ void loop() {
           break;
 
       case 'F':
-          Serial.println("Fractional mode selected!");
-          MAX2871_SetFracMode();
+          //Serial.println("Fractional mode selected!");
+          if(!frac)
+            frac = 1;
+            MAX2871_SetFracMode();
           //Serial.print("Set fractional division value F: ");
           MAX2871_SetF(String2Int());
           break;

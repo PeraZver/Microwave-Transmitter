@@ -15,6 +15,12 @@ Some parts of the circuit design based on H. Forsten's home made VNA. The microw
  * **Power supply** that scales 12V input to 5V, 3.6V, 3.3V and 1.8V. 
 
 
+User's guide of Microwave Transmitter is available at [Github repo's wiki](https://github.com/PeraZver/Microwave-Transmitter/wiki).
+
+Development log of the Microwave Transmitter is documented at [Hackaday.io](https://hackaday.io/project/20350-microwave-transmitter).
+
+
+
 
 Pero, February 2017
 

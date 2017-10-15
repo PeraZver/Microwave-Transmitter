@@ -21,7 +21,11 @@ Use following commands:
 
  Frequency can be easily set by two functions
    * `FINT x` - set sets frequency x in integer mode
-   * `FFRA x` - set sets frequency x in fractional mode
+   * `FFRAC x` - set sets frequency x in fractional mode
+
+
+ To set the attentuation, use command:
+   * `ATT x` - where x is attenuation in dB from 0 to 32 in steps of 0.25 dB. 
 
  Special spice is function `sweep`, that enables sweep of every parameter (but will work only with F and N):
   * `sweep x a b dt` - x can be N or F, a is lower limit, b is the upper and dt is time resolution in ms.

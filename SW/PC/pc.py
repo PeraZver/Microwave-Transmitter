@@ -192,6 +192,10 @@ def command_parser(data, ser):
     elif (user_in[0] == 'g'):
         read_registers(ser)
         return ('')
+        
+    elif (user_in[0] in ("ATT", "att")):
+        print 'Attenutation set ' + user_in[1] + ' dB.'
+        return ('a' + str(int(float(user_in[1])*4)) + 'a')
     
     elif (user_in[0] == 'FINT'):  # Set frequency in integer mode
         N, D = set_frequency_INT(int(user_in[1]))
@@ -324,7 +328,12 @@ def read_help(*args):
         
         To sweep parameters, try this:
         
-        sweep x a b dt - sweep parameters from a to b."""        
+        sweep x a b dt - sweep parameters from a to b.
+        
+        To set the attentuation, use command:
+        
+        ATT x - where x is attenuation in dB from 0 to 32 in steps of 0.25 dB."""  
+        
         
 if __name__ == "__main__":   
     main()

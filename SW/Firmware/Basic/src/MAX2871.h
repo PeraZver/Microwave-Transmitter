@@ -9,7 +9,7 @@
 #define clkPin      13  // clk pin
 
 // this parameters should be changed to suit the application
-#define N_val 200  // (16 bit feedback divider factor in integer mode
+#define N_val (uint32_t)200  // (16 bit feedback divider factor in integer mode
 #define F_val 0  // 12 bit  fractional divider
 #define M_val 100  // 12 bit modulus value in fractional mode
 #define R_val 1  // 10 bit ref. frequency divider value

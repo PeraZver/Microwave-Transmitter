@@ -90,6 +90,10 @@ void loop() {
           MAX2871_RFA_SelectPower(Serial.read());
           break;
 
+      case 'a':
+          PE43711_SPI_tx(String2Int());
+          break;
+
       case 'f':
           SelectFilter(Serial.read());
           break;
